@@ -1,0 +1,45 @@
+name: "ECLAIR"
+on: [workflow_dispatch]
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  Analyze:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Analyze
+      run: |
+        set -e
+        cd ECLAIR
+        gh_ref=$(echo $GITHUB_REF_NAME | sed 's,/,_,')
+        # Prepare for build
+        ../prepare.sh
+        # Analyze the project
+        ./analyze.sh
+        # Make the directory for ECLAIR project database
+        DEST=/home/github/public
+        mkdir -p $DEST/$GITHUB_REPOSITORY/$GITHUB_RUN_NUMBER
+        rm -f $DEST/$GITHUB_REPOSITORY/last_$gh_ref
+        ln -s $DEST/$GITHUB_REPOSITORY/$GITHUB_RUN_NUMBER $DEST/$GITHUB_REPOSITORY/last_$gh_ref
+        # Copy the project database
+        scp out/PROJECT.ecd $DEST/$GITHUB_REPOSITORY/$GITHUB_RUN_NUMBER
+        # Make a custom badge
+        mkdir -p $DEST/$GITHUB_REPOSITORY/$GITHUB_RUN_NUMBER/PROJECT.ecdf
+        anybadge --label=ECLAIR --value=default --file=badge.svg
+        scp badge.svg $DEST/$GITHUB_REPOSITORY/$GITHUB_RUN_NUMBER/PROJECT.ecdf
+        
+        # Publish ECLAIR report link
+        echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
+        echo "[![ECLAIR]\
+        (https://eclairit.com:3787/fs/home/github/public/${GITHUB_REPOSITORY}/${GITHUB_RUN_NUMBER}/PROJECT.ecdf/badge.svg)]\
+        (https://eclairit.com:3787/fs/home/github/public/${GITHUB_REPOSITORY}/${GITHUB_RUN_NUMBER}/PROJECT.ecd)" \
+        >>"${GITHUB_STEP_SUMMARY}"
+    - name: Upload SARIF
+      run: |
+        ./ECLAIR/upload.sh
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: ECLAIR/out
