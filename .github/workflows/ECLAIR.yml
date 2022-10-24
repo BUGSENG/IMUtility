@@ -8,17 +8,17 @@ on:
     types: ['opened', 'edited', 'reopened']
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  IS_PR: ${{ github.event_name == pull_request }}
+  IS_PR: ${{ github.event_name == 'pull_request' }}
 jobs:
   Analyze:
     runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      if: ${{ github.event_name != pull_request }}
+      if: ${{ github.event_name != 'pull_request' }}
     - name: Checkout PR HEAD
       uses: actions/checkout@v3
-      if: ${{ github.event_name == pull_request }}
+      if: ${{ github.event_name == 'pull_request' }}
       with:
         ref: ${{ github.event.pull_request.head.sha }}
     - name: Analyze
