@@ -17,44 +17,44 @@ results_root=$1
 current_job_id=$2
 commit_id=$3
 
-current_dir=${results_root}/${current_job_id}
-current_db=${current_dir}/PROJECT.ecd
-current_ecdf=${current_dir}/PROJECT.ecdf
+current_dir="${results_root}/${current_job_id}"
+current_db="${current_dir}/PROJECT.ecd"
 
-mkdir -p "${current_ecdf}"
+# The group where eclair_report runs (on the eclair report host) must have write permission on the db file
+chgrp jenkins "${current_db}"
+chmod g+w "${current_db}"
 
-last_dir=${results_root}/last
+last_dir="${results_root}/last"
 last_job_id=
 [ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
 
 if [ -n "${last_job_id}" ]; then
-    last_db=${last_dir}/PROJECT.ecd
-    last_ecdf=${last_dir}/PROJECT.ecdf
-    last_new_reports=$(cat "${last_dir}/new_reports")
-    previous_dir=${last_dir}/prev
+    last_db="${last_dir}/PROJECT.ecd"
+    last_new_reports=$(cat "${last_dir}/new_reports.txt")
+    previous_dir="${last_dir}/prev"
     previous_job_id=
     [ ! -d "${previous_dir}" ] || previous_job_id=$(basename "$(realpath "${previous_dir}")")
 
     # Tag previous and current databases
-    ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
+    eclair_report -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
         -tag_diff="'${last_db}','${current_db}'"
 
     # Count reports
     fixed_reports=$(${eclair_report} -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
-    echo "${fixed_reports}" >"${current_dir}/fixed_reports"
+    echo "${fixed_reports}" >"${current_dir}/fixed_reports.txt"
     new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
-    echo "${new_reports}" >"${current_dir}/new_reports"
+    echo "${new_reports}" >"${current_dir}/new_reports.txt"
 
     # Generate badge for the current run
-    anybadge -o --label="ECLAIR #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_ecdf}/badge.svg"
+    anybadge -o --label="eclair #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_dir}/badge.svg"
     # Modify the badge of the previous run
     if [ -n "${previous_job_id}" ]; then
         msg="not in #${previous_job_id}: ${last_new_reports}"
     else
         msg="reports: ${last_new_reports}"
     fi
-    anybadge -o --label="ECLAIR #${last_job_id}" \
-        --value="${msg}, not in #${current_job_id}: ${fixed_reports}" --file="${last_ecdf}/badge.svg"
+    anybadge -o --label="eclair #${last_job_id}" \
+        --value="${msg}, not in #${current_job_id}: ${fixed_reports}" --file="${last_dir}/badge.svg"
 
     # Add link to previous run of current run
     ln -s "../${last_job_id}" "${current_dir}/prev"
@@ -64,9 +64,9 @@ if [ -n "${last_job_id}" ]; then
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${current_ecdf}/badge.svg"
+    anybadge -o --label="eclair ${current_job_id}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
     # Write report count to file
-    echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports"
+    echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports.txt"
 fi
 
 # Update last symlink
