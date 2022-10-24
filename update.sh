@@ -20,8 +20,7 @@ commit_id=$3
 current_dir="${results_root}/${current_job_id}"
 current_db="${current_dir}/PROJECT.ecd"
 
-# The group where eclair_report runs (on the eclair report host) must have write permission on the db file
-chgrp jenkins "${current_db}"
+# The group where eclair_report runs must be in this file's group
 chmod g+w "${current_db}"
 
 last_dir="${results_root}/last"
