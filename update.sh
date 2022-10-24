@@ -11,37 +11,45 @@ usage() {
     exit 2
 }
 
-[ $# -eq 3 ] || usage
+[ $# -eq 5 ] || usage
 
+# $1 is a directory that needs to end in .ecdf
 results_root=$1
 current_job_id=$2
 commit_id=$3
+is_pr=$4
+base_pr_sha=$5
 
-current_dir="${results_root}/${current_job_id}"
-current_db="${current_dir}/PROJECT.ecd"
+current_dir=${results_root}/${current_job_id}
+current_db=${current_dir}/PROJECT.ecd
 
 # The group where eclair_report runs must be in this file's group
 chmod g+w "${current_db}"
 
+# If the analysis is triggered by a PR, the last db must be the base of that PR
 last_dir="${results_root}/last"
+if [ "${is_pr}" = 'true' ]; then
+    last_dir="${last_dir}/commits/${base_pr_sha}"
+fi
+
 last_job_id=
 [ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
 
 if [ -n "${last_job_id}" ]; then
     last_db="${last_dir}/PROJECT.ecd"
     last_new_reports=$(cat "${last_dir}/new_reports.txt")
-    previous_dir="${last_dir}/prev"
+    previous_dir=${last_dir}/prev
     previous_job_id=
     [ ! -d "${previous_dir}" ] || previous_job_id=$(basename "$(realpath "${previous_dir}")")
 
     # Tag previous and current databases
-    ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
+    eclair_report -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
         -tag_diff="'${last_db}','${current_db}'"
 
     # Count reports
-    fixed_reports=$(${eclair_report} -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    fixed_reports=$(eclair_report -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
     echo "${fixed_reports}" >"${current_dir}/fixed_reports.txt"
-    new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
+    new_reports=$(eclair_report -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
     echo "${new_reports}" >"${current_dir}/new_reports.txt"
 
     # Generate badge for the current run
@@ -62,7 +70,7 @@ if [ -n "${last_job_id}" ]; then
     ln -s "../${current_job_id}" "${last_dir}/next"
 
 else
-    new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
+    new_reports=$(eclair_report -db="${current_db}" '-print="",reports_count()')
     anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
     # Write report count to file
     echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports.txt"
@@ -72,4 +80,5 @@ fi
 ln -sfn "${current_job_id}" "${results_root}/last"
 
 # Add a link relating commit id to last build done for it
-ln -sfn "${current_job_id}" "${results_root}/${commit_id}"
+mkdir -p "${results_root}/commits/"
+ln -sfn "../${current_job_id}" "${results_root}/commits/${commit_id}"

@@ -1,18 +1,35 @@
 name: "ECLAIR"
-on: [workflow_dispatch, push]
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types: ['opened', 'edited', 'reopened']
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  IS_PR: ${{ github.event_name == pull_request }}
 jobs:
   Analyze:
     runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      if: ${{ github.event_name != pull_request }}
+    - name: Checkout PR HEAD
+      uses: actions/checkout@v3
+      if: ${{ github.event_name == pull_request }}
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
     - name: Analyze
       run: |
         set -e
         cd ECLAIR
         gh_ref=$(echo $GITHUB_REF_NAME | sed 's,/,_,')
+
+        # PR base commit sha (should already have and .ecd)
+        BASE_PR_SHA=${{ github.event.pull_request.base.sha }}
+
         # Prepare for build
         ../prepare.sh
         # Analyze the project
