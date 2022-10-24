@@ -82,8 +82,8 @@ ln -sfn "../${current_job_id}" "${results_root}/commits/${commit_id}"
 ECLAIR_REPORT_HOST="eclairit.com" # TODO: pass this as a variable
 {
     echo "# ECLAIR analysis summary:"
-    printf "\- Fixed reports: %d\n" "${fixed_reports}"
-    printf "\- New reports: %d\n" "${new_reports}"
+    printf "Fixed reports: %d\n" "${fixed_reports}"
+    printf "New reports: %d\n" "${new_reports}"
     echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}:3787/fs${current_dir}/index.html)"
     echo "*****************************************************"
 } >>"${current_dir}/summary.txt"
