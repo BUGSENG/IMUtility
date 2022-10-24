@@ -62,6 +62,7 @@ bool Json_addData(char *buffer, size_t buffer_size, const char *key, const char 
 
     if (0 == strcmp(&buffer[index - 1U], "\""))
     {
+        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], ",");
         ++index;
     }
@@ -69,8 +70,10 @@ bool Json_addData(char *buffer, size_t buffer_size, const char *key, const char 
     if (total_size <= (buffer_size - index))
     {
 
+        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], "\"");
         index += strlen("\"");
+        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], key);
         index += strlen(key);
         strcpy(&buffer[index], "\":\"");
