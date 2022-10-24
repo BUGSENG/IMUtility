@@ -60,7 +60,7 @@ if [ -n "${last_job_id}" ]; then
     ln -s "../${last_job_id}" "${current_dir}/prev"
 
     # Add link to next run of last run
-    ln -s "../${current_job_id}" "${last_job_id}/next"
+    ln -s "../${current_job_id}" "${last_dir}/next"
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
