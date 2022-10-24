@@ -24,15 +24,3 @@ scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECLAIR_REPORT_HOST_SCP}${PROJECT_AR
 scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
 ${ECLAIR_REPORT_HOST_SH} "IS_PR=${IS_PR} BASE_PR_SHA=${BASE_PR_SHA} ${PROJECT_ARTIFACTS_PATH}/update.sh ${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_SHA}"
-
-# Publish ECLAIR report links
-echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
-# Previous
-echo "[![ECLAIR prev](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"
-# Current
-echo "[![ECLAIR current](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"
-# Next (missing)
-echo "[![ECLAIR next](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"

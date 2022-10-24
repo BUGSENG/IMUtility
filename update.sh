@@ -55,15 +55,10 @@ if [ -n "${last_job_id}" ]; then
     echo "${new_reports}" >"${current_dir}/new_reports.txt"
 
     # Generate badge for the current run
-    anybadge -o --label="ECLAIR #${current_job_id}" --value="new: ${new_reports} | fixed: ${fixed_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="ECLAIR #${current_job_id}" --value="fixed: ${fixed_reports} | new: ${new_reports}" --file="${current_dir}/badge.svg"
     # Modify the badge of the previous run
-    if [ -n "${previous_job_id}" ]; then
-        msg="new: ${last_new_reports}"
-    else
-        msg="new: ${last_new_reports}"
-    fi
     anybadge -o --label="ECLAIR #${last_job_id}" \
-        --value="${msg} | fixed: ${fixed_reports}" --file="${last_dir}/badge.svg"
+        --value="fixed: ${fixed_reports} | new: ${last_new_reports}" --file="${last_dir}/badge.svg"
 
     # Add link to previous run of current run
     ln -s "../${last_job_id}" "${current_dir}/prev"
@@ -90,9 +85,9 @@ ECLAIR_REPORT_HOST="eclairit.com" # TODO: pass this as a variable
 {
     echo "*****************************************************"
     echo "ECLAIR analysis summary:"
-    printf "Fixed reports: %d" ${fixed_reports}
-    printf "New reports: %d" ${new_reports}
-    echo "Browse analysis: https://${ECLAIR_REPORT_HOST}:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/index.html"
+    printf "Fixed reports: %d\n" ${fixed_reports}
+    printf "New reports: %d\n" ${new_reports}
+    echo "Browse analysis: https://${ECLAIR_REPORT_HOST}:3787/fs${current_dir}/index.html"
     echo "*****************************************************"
 } >>"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"
