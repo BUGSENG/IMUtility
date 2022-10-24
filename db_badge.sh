@@ -28,16 +28,15 @@ ${ECLAIR_REPORT_HOST_SH} "${PROJECT_ARTIFACTS_PATH}/update.sh ${PROJECT_ARTIFACT
 # Publish ECLAIR report links
 echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
 # Previous
-echo "[![ECLAIR prev](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecd)" \
-    >>"${GITHUB_STEP_SUMMARY}"
-
+echo "<a target=\"_blank\" href=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecd\"> \
+<img alt=\"ECLAIR prev\" src=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecdf/badge.svg\">\
+</a>" >>"${GITHUB_STEP_SUMMARY}"
 # Current
-echo "[![ECLAIR](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecd)" \
-    >>"${GITHUB_STEP_SUMMARY}"
+echo "<a target=\"_blank\" href=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecd\"> \
+<img alt=\"ECLAIR ${JOB_ID}\" src=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecdf/badge.svg\">\
+</a>" >>"${GITHUB_STEP_SUMMARY}"
 
 # Next (missing)
-echo "[![ECLAIR next](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecd)" \
-    >>"${GITHUB_STEP_SUMMARY}"
+echo "<a target=\"_blank\" href=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecd\"> \
+<img alt=\"ECLAIR next\" src=\"https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecdf/badge.svg\">\
+</a>" >>"${GITHUB_STEP_SUMMARY}"
