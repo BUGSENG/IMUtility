@@ -28,19 +28,16 @@ ${ECLAIR_REPORT_HOST_SH} "${PROJECT_ARTIFACTS_PATH}/update.sh ${PROJECT_ARTIFACT
 # Publish ECLAIR report links
 echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
 # Previous
-echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecdf/badge.svg)]\
+echo "[![ECLAIR prev](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecdf/badge.svg)]\
         (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecd)" \
     >>"${GITHUB_STEP_SUMMARY}"
 
 # Current
-echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}${JOB_ID}/PROJECT.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}${JOB_ID}/PROJECT.ecd)" \
+echo "[![ECLAIR](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecdf/badge.svg)]\
+        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecd)" \
     >>"${GITHUB_STEP_SUMMARY}"
 
 # Next (missing)
-echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecdf/badge.svg)]\
+echo "[![ECLAIR next](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecdf/badge.svg)]\
         (https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecd)" \
     >>"${GITHUB_STEP_SUMMARY}"

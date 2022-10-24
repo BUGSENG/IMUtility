@@ -21,6 +21,8 @@ current_dir=${results_root}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
 current_ecdf=${current_dir}/PROJECT.ecdf
 
+mkdir -p "${current_ecdf}"
+
 last_dir=${results_root}/last
 last_job_id=
 [ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
@@ -44,7 +46,6 @@ if [ -n "${last_job_id}" ]; then
     echo "${new_reports}" >"${current_dir}/new_reports"
 
     # Generate badge for the current run
-    mkdir -p "${current_ecdf}"
     anybadge --label="eclair #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_ecdf}/badge.svg"
     # Modify the badge of the previous run
     if [ -n "${previous_job_id}" ]; then
@@ -63,7 +64,7 @@ if [ -n "${last_job_id}" ]; then
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    anybadge --label="eclair ${current_job_id}" --value="reports: ${new_reports}"
+    anybadge --label="eclair ${current_job_id}" --value="reports: ${new_reports}" --file="${current_ecdf}/badge.svg"
     # Write report count to file
     echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports"
 fi
