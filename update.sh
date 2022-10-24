@@ -35,7 +35,7 @@ if [ -n "${last_job_id}" ]; then
     [ ! -d "${previous_dir}" ] || previous_job_id=$(basename "$(realpath "${previous_dir}")")
 
     # Tag previous and current databases
-    eclair_report -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
+    ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
         -tag_diff="'${last_db}','${current_db}'"
 
     # Count reports
