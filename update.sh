@@ -70,7 +70,7 @@ else
 fi
 
 # Update last symlink
-ln -sf "${current_job_id}" "${results_root}/last"
+ln -sfn "${current_job_id}" "${results_root}/last"
 
 # Add a link relating commit id to last build done for it
-ln -sf "${current_job_id}" "${results_root}/${commit_id}"
+ln -sfn "${current_job_id}" "${results_root}/${commit_id}"
