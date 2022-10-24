@@ -17,51 +17,8 @@ jobs:
         ../prepare.sh
         # Analyze the project
         ./analyze.sh
-    - name: Prepare database and badge
-        # Set variables
-        ECLAIR_REPORT_USER="github"
-        ECLAIR_REPORT_HOST="eclairit.com"
-        ECLAIR_REPORT_HOST_SCP=""
-        ECLAIR_REPORT_HOST_SH="sh -c"
-        ARTIFACTS_ROOT="/home/github/public"
-        PROJECT_PATH="${GITHUB_REPOSITORY}"
-        VARIANT="${gh_ref}"
-        JOB_ID="${GITHUB_RUN_NUMBER}"
-        ANALYSIS_OUTPUT_PATH="${ARTIFACTS_ROOT}/ECLAIR/out/"
-        PROJECT_ARTIFACTS_PATH=${ARTIFACTS_ROOT}/${PROJECT_PATH}
-
-        # create a directory for the analysis results
-        ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${VARIANT}/${JOB_ID}/"
-        # Transfer the database to eclair_report_host
-        scp ${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd ${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${VARIANT}/${JOB_ID}/
-
-        # Send the script to update symlinks
-        scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
-        # Load needed variables in eclair_report_host and execute the script
-        ${ECLAIR_REPORT_SH} "PROJECT_ARTIFACTS_PATH=${PROJECT_ARTIFACTS_PATH}; \
-        VARIANT=${VARIANT};JOB_ID=${JOB_ID};\
-        ./${PROJECT_ARTIFACTS_PATH}/update.sh"
-
-        # Publish ECLAIR report links
-        echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
-        # Previous
-        echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/$(( JOB_ID - 1 ))/.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs/home/${ECLAIR_REPORT_USER}/public/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/previous/PROJECT.ecd)" \
-        >> "${GITHUB_STEP_SUMMARY}"
-        
-        # Current
-        echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/${JOB_ID}/.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs/home/${ECLAIR_REPORT_USER}/public/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/${JOB_ID}/PROJECT.ecd)" \
-        >> "${GITHUB_STEP_SUMMARY}"
-
-        # Next (missing)
-        echo "[![ECLAIR]\
-        (https://eclairit.com:3787/fs/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/$(( JOB_ID + 1 ))/.ecdf/badge.svg)]\
-        (https://eclairit.com:3787/fs/home/${ECLAIR_REPORT_USER}/public/${PROJECT_ARTIFACTS_PATH}/${VARIANT}/$(( JOB_ID + 1 )/PROJECT.ecd)" \
-        >> "${GITHUB_STEP_SUMMARY}"
-        
+        # Tag database and create badges
+        ../db_badge.sh
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh

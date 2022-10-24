@@ -2,61 +2,70 @@
 
 set -e
 
-PROJECT_PATH_VARIANT="${PROJECT_ARTIFACTS_PATH}/${VARIANT}"
+usage() {
+    echo "Usage: $0 RESULTS_ROOT JOB_ID COMMIT_ID" >&2
+    exit 2
+}
 
-CURRENT_JOB_ID="${JOB_ID}"
-CURRENT_DB="${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/PROJECT.ecd"
-CURRENT_ECDF="${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/.ecdf/"
+[ $# -eq 3 ] || usage
 
-PREVIOUS_JOB_ID=$(cat "${PROJECT_PATH_VARIANT}/last/id") # retrieve last successful run id (if any)
+results_root=$1
+current_job_id=$2
+commit_id=$3
 
-if [ -n "${PREVIOUS_JOB_ID}" ]; then
-    PREVIOUS_DB="${PROJECT_PATH_VARIANT}/${PREVIOUS_JOB_ID}/PROJECT.ecd"
-    PREVIOUS_ECDF="${PROJECT_PATH_VARIANT}/${PREVIOUS_JOB_ID}/.ecdf/"
-    PREVIOUS_MISSING=$(cat "${PROJECT_PATH_VARIANT}/last/prev_missing")
-    OLD_PREVIOUS_JOB_ID=$(cat "${PROJECT_PATH_VARIANT}/previous/id")
+current_dir=${results_root}/${current_job_id}
+current_db=${current_dir}/PROJECT.ecd
+current_ecdf=${current_dir}/PROJECT.ecdf
+
+last_dir=${results_root}/last
+last_job_id=
+[ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
+
+if [ -n "${last_job_id}" ]; then
+    last_db=${last_dir}/PROJECT.ecd
+    last_ecdf=${last_dir}/PROJECT.ecdf
+    last_new_reports=$(cat "${last_dir}/new_reports")
+    previous_dir=${last_dir}/prev
+    previous_job_id=
+    [ ! -d "${previous_dir}" ] || previous_job_id=$(basename "$(realpath "${previous_dir}")")
 
     # Tag previous and current databases
     eclair_report -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
-        -tag_diff="${PROJECT_PATH_VARIANT}/${PREVIOUS_JOB_ID}/PROJECT.ecd,\
-    ${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/PROJECT.ecd"
+        -tag_diff="'${last_db}','${current_db}'"
 
     # Count reports
-    new_reports=$(eclair_report -db="${PREVIOUS_DB}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
-    fixed_reports=$(eclair_report -db="${CURRENT_DB}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    fixed_reports=$(eclair_report -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    echo "${fixed_reports}" >"${current_dir}/fixed_reports"
+    new_reports=$(eclair_report -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
+    echo "${new_reports}" >"${current_dir}/new_reports"
 
     # Generate badge for the current run
-    anybadge --label="ECLAIR #${CURRENT_JOB_ID}" --value="not in #${PREVIOUS_JOB_ID}: ${new_reports}" --file="${CURRENT_ECDF}/badge.svg"
+    mkdir -p "${current_ecdf}"
+    anybadge --label="eclair #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_ecdf}/badge.svg"
     # Modify the badge of the previous run
-    if [ -n "${PREVIOUS_MISSING}" ]; then
-        anybadge --label="ECLAIR #${PREVIOUS_JOB_ID}" \
-            --value="not in #${OLD_PREVIOUS_JOB_ID}: ${PREVIOUS_MISSING}, not in #${CURRENT_JOB_ID}: ${fixed_reports}" --file="${PREVIOUS_ECDF}/badge.svg"
+    if [ -n "${previous_job_id}" ]; then
+        msg="not in #${previous_job_id}: ${last_new_reports}"
     else
-        # The previous run was the first
-        anybadge --label="ECLAIR #${PREVIOUS_JOB_ID}" \
-            --value="#reports: ${PREVIOUS_MISSING},not in #${CURRENT_JOB_ID}: ${fixed_reports}" --file="${PREVIOUS_ECDF}/badge.svg"
+        msg="reports: ${last_new_reports}"
     fi
+    anybadge --label="eclair #${last_job_id}" \
+        --value="${msg}, not in #${current_job_id}: ${fixed_reports}" --file="${last_ecdf}/badge.svg"
 
-    # Write report counts to files
-    echo "${new_reports}" >"${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/prev_missing"
-    # Is it needed?
-    #echo "${fixed_reports}" >"${PROJECT_PATH_VARIANT}/${PREVIOUS_JOB_ID}/next_missing"
+    # Add link to previous run of current run
+    ln -s "../${last_job_id}" "${current_dir}/prev"
 
-    # Switch previous symlink
-    ln -sf "${PROJECT_PATH_VARIANT}/${PREVIOUS_JOB_ID}" "${PROJECT_PATH_VARIANT}/previous"
+    # Add link to next run of last run
+    ln -s "../${current_job_id}" "${last_job_id}/next"
 
 else
-    report_count=$(eclair_report -db="${CURRENT_DB}" '-print="",reports_count()')
-    anybadge --label="ECLAIR ${CURRENT_JOB_ID}" --value=" #reports: ${report_count}"
+    new_reports=$(eclair_report -db="${current_db}" '-print="",reports_count()')
+    anybadge --label="eclair ${current_job_id}" --value="reports: ${new_reports}"
     # Write report count to file
-    echo "${report_count}" >"${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/prev_missing"
+    echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports"
 fi
 
-# Empty svg for the next run
-anybadge --label="ECLAIR #$((CURRENT_JOB_ID + 1))" --value="missing" --color="red"
-
-# Write this job's id for future use
-echo "${CURRENT_JOB_ID}" >"${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}/id"
-
 # Update last symlink
-ln -sf "${PROJECT_PATH_VARIANT}/${CURRENT_JOB_ID}" "${PROJECT_PATH_VARIANT}/last"
+ln -sf "${current_job_id}" "${results_root}/last"
+
+# Add a link relating commit id to last build done for it
+ln -sf "${current_job_id}" "${results_root}/${commit_id}"
