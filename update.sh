@@ -11,14 +11,14 @@ usage() {
     exit 2
 }
 
-[ $# -eq 5 ] || usage
+[ $# -eq 3 ] || usage
 
 # $1 is a directory that needs to end in .ecdf
 results_root=$1
 current_job_id=$2
 commit_id=$3
-is_pr=$4
-base_pr_sha=$5
+is_pr="${IS_PR:-false}"
+base_pr_sha="${BASE_PR_SHA}"
 
 current_dir=${results_root}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
