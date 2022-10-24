@@ -36,12 +36,13 @@
 
 #define MINIMAL_SIZE 2U // size of '{' or '}' + '\0'
 
-bool
-Json_startString(char* buffer, size_t buffer_size) {
+bool Json_startString(char *buffer, size_t buffer_size)
+{
 
     bool success = false;
 
-    if (buffer_size >  MINIMAL_SIZE) {
+    if (buffer_size > MINIMAL_SIZE)
+    {
         // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[0], "{");
         success = true;
@@ -50,8 +51,8 @@ Json_startString(char* buffer, size_t buffer_size) {
     return success;
 }
 
-bool
-Json_addData(char* buffer, size_t buffer_size, const char* key,  const char* value) {
+bool Json_addData(char *buffer, size_t buffer_size, const char *key, const char *value)
+{
 
     bool success = false;
 
@@ -59,27 +60,23 @@ Json_addData(char* buffer, size_t buffer_size, const char* key,  const char* val
     size_t total_size = 0U;
     total_size += strlen("\"\":\"\"") + strlen(key) + strlen(value) + 1U;
 
-    if (0 == strcmp(&buffer[index - 1U], "\"")) {
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
+    if (0 == strcmp(&buffer[index - 1U], "\""))
+    {
         strcpy(&buffer[index], ",");
         ++index;
     }
 
-    if (total_size <= (buffer_size - index)) {
+    if (total_size <= (buffer_size - index))
+    {
 
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], "\"");
         index += strlen("\"");
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], key);
         index += strlen(key);
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], "\":\"");
         index += strlen("\":\"");
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], value);
         index += strlen(value);
-        // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], "\"");
 
         success = true;
@@ -87,13 +84,14 @@ Json_addData(char* buffer, size_t buffer_size, const char* key,  const char* val
 
     return success;
 }
-bool
-Json_endString(char* buffer, size_t buffer_size) {
+bool Json_endString(char *buffer, size_t buffer_size)
+{
 
     bool success = false;
 
     size_t index = strlen(buffer);
-    if (buffer_size >= (MINIMAL_SIZE + index)) {
+    if (buffer_size >= (MINIMAL_SIZE + index))
+    {
         // cppcheck-suppress misra-c2012-17.7; return value is not used, not needed in this case
         strcpy(&buffer[index], "}");
         success = true;
@@ -102,8 +100,8 @@ Json_endString(char* buffer, size_t buffer_size) {
     return success;
 }
 
-bool
-Json_findByKey(char* buffer,  size_t buffer_size, char* key, char* value, size_t max_value_size) {
+bool Json_findByKey(char *buffer, size_t buffer_size, char *key, char *value, size_t max_value_size)
+{
 
     bool success = false;
 
@@ -112,11 +110,14 @@ Json_findByKey(char* buffer,  size_t buffer_size, char* key, char* value, size_t
     uint32_t index;
     size_t key_size = strlen(key);
 
-    for (index = 0; index < max_search_size; ++index) {
+    for (index = 0; index < max_search_size; ++index)
+    {
 
-        if (0 == strncmp(&buffer[index], key, key_size)) {
+        if (0 == strncmp(&buffer[index], key, key_size))
+        {
 
-            if (buffer[index + key_size] == '"') {
+            if (buffer[index + key_size] == '"')
+            {
                 success = true;
             }
 
@@ -124,12 +125,15 @@ Json_findByKey(char* buffer,  size_t buffer_size, char* key, char* value, size_t
         }
     }
 
-    if (success) {
+    if (success)
+    {
 
         success = false;
-        for (index = index + key_size + 1u; index < buffer_size; ++index) {
+        for (index = index + key_size + 1u; index < buffer_size; ++index)
+        {
 
-            if (buffer[index] == '"') {
+            if (buffer[index] == '"')
+            {
                 break;
             }
         }
@@ -137,11 +141,13 @@ Json_findByKey(char* buffer,  size_t buffer_size, char* key, char* value, size_t
         size_t value_size = 0;
         ++index;
 
-        for ( ; (index < buffer_size) && (value_size < max_value_size); ++index) {
+        for (; (index < buffer_size) && (value_size < max_value_size); ++index)
+        {
 
             value[value_size] = buffer[index];
 
-            if (buffer[index] == '"') {
+            if (buffer[index] == '"')
+            {
                 value[value_size] = '\0';
                 success = true;
                 break;
