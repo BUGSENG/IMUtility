@@ -2,6 +2,10 @@
 
 set -e
 
+# To be adjusted to local setup
+ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
+eclair_report="${ECLAIR_PATH}eclair_report"
+
 usage() {
     echo "Usage: $0 RESULTS_ROOT JOB_ID COMMIT_ID" >&2
     exit 2
@@ -30,13 +34,13 @@ if [ -n "${last_job_id}" ]; then
     [ ! -d "${previous_dir}" ] || previous_job_id=$(basename "$(realpath "${previous_dir}")")
 
     # Tag previous and current databases
-    eclair_report -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
+    ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
         -tag_diff="'${last_db}','${current_db}'"
 
     # Count reports
-    fixed_reports=$(eclair_report -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    fixed_reports=$(${eclair_report} -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
     echo "${fixed_reports}" >"${current_dir}/fixed_reports"
-    new_reports=$(eclair_report -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
+    new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
     echo "${new_reports}" >"${current_dir}/new_reports"
 
     # Generate badge for the current run
@@ -58,7 +62,7 @@ if [ -n "${last_job_id}" ]; then
     ln -s "../${current_job_id}" "${last_job_id}/next"
 
 else
-    new_reports=$(eclair_report -db="${current_db}" '-print="",reports_count()')
+    new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
     anybadge --label="eclair ${current_job_id}" --value="reports: ${new_reports}"
     # Write report count to file
     echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports"
