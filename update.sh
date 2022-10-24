@@ -32,8 +32,6 @@ if [ "${is_pr}" = 'true' ]; then
     last_dir="${last_dir}/commits/${base_pr_sha}"
 fi
 
-echo "${last_dir}"
-
 last_job_id=
 [ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
 
