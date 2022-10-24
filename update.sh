@@ -83,11 +83,13 @@ generate_index() {
     local next_dir
     local index_file
     local previous_db
+    local fs
 
-    prev_dir="${current_dir}/prev"
-    next_dir="${current_dir}/next"
-    index_file="${current_dir}/index.html"
-    previous_db="${prev_dir}/PROJECT.ecd"
+    fs="/fs"
+    prev_dir="${fs}${current_dir}/prev"
+    next_dir="${fs}${current_dir}/next"
+    index_file="${fs}${current_dir}/index.html"
+    previous_db="${fs}${prev_dir}/PROJECT.ecd"
 
     {
         echo "<!DOCTYPE html>"
@@ -108,7 +110,7 @@ generate_index() {
 
         echo "<p>"
         if [[ -d ${prev_dir} ]]; then
-            echo "<a href=\"${prev_dir}/index.html\">Previous job</a>"
+            echo "<a href=\"/fs/${prev_dir}/index.html\">Previous job</a>"
             echo ", "
         fi
         echo "<a href=\"${next_dir}/index.html\">Next job</a>"
