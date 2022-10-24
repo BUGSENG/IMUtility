@@ -46,14 +46,14 @@ if [ -n "${last_job_id}" ]; then
     echo "${new_reports}" >"${current_dir}/new_reports"
 
     # Generate badge for the current run
-    anybadge --label="eclair #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_ecdf}/badge.svg"
+    anybadge -o --label="eclair #${current_job_id}" --value="not in #${last_job_id}: ${new_reports}" --file="${current_ecdf}/badge.svg"
     # Modify the badge of the previous run
     if [ -n "${previous_job_id}" ]; then
         msg="not in #${previous_job_id}: ${last_new_reports}"
     else
         msg="reports: ${last_new_reports}"
     fi
-    anybadge --label="eclair #${last_job_id}" \
+    anybadge -o --label="eclair #${last_job_id}" \
         --value="${msg}, not in #${current_job_id}: ${fixed_reports}" --file="${last_ecdf}/badge.svg"
 
     # Add link to previous run of current run
@@ -64,7 +64,7 @@ if [ -n "${last_job_id}" ]; then
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    anybadge --label="eclair ${current_job_id}" --value="reports: ${new_reports}" --file="${current_ecdf}/badge.svg"
+    anybadge -o --label="eclair ${current_job_id}" --value="reports: ${new_reports}" --file="${current_ecdf}/badge.svg"
     # Write report count to file
     echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports"
 fi
