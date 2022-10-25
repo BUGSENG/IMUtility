@@ -15,27 +15,23 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      if: ${{ github.event_name != 'pull_request' }}
     - name: Checkout PR HEAD
       uses: actions/checkout@v3
-      if: ${{ github.event_name == 'pull_request' }}
+      if: ${{ IS_PR == 'true' }}
       with:
         ref: ${{ github.event.pull_request.head.sha }}
+        path: ${{ github.event.pull_request.head.sha }}
     - name: Analyze
       run: |
         set -e
         cd ECLAIR
         gh_ref=$(echo $GITHUB_REF_NAME | sed 's,/,_,')
-
         # PR base commit sha (should already have and .ecd)
         BASE_PR_SHA=${{ github.event.pull_request.base.sha }}
 
-        # Prepare for build
         ../prepare.sh
-        # Analyze the project
         ./analyze.sh
-        # Tag database and create badges
-        ../db_badge.sh
+        ../tag_db.sh
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh

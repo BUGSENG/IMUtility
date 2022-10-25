@@ -7,16 +7,17 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID" >&2
+    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID IS_PR" >&2
     exit 2
 }
 
-[[ $# -eq 4 ]] || usage
+[[ $# -eq 5 ]] || usage
 
 results_root=$1
 current_job_id=$2
 job_headline=$3
 commit_id=$4
+is_pr=$5
 
 current_dir=${results_root}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
@@ -27,7 +28,11 @@ mkdir -p "${commits_dir}"
 # The group where eclair_report runs must be in this file's group
 chmod -R g+w "${current_dir}"
 
-last_dir=${results_root}/last
+last_dir="${results_root}/last"
+if [ "${is_pr}" = 'true' ]; then
+    last_dir="${results_root}/commits/${base_pr_sha}"
+fi
+
 last_job_id=
 [[ ! -d "${last_dir}" ]] || last_job_id=$(basename "$(realpath "${last_dir}")")
 
@@ -64,7 +69,7 @@ fi
 ln -sfn "${current_job_id}" "${results_root}/last"
 
 # Add a link relating commit id to last build done for it
-ln -sfn "${current_job_id}" "${commits_dir}/${commit_id}"
+ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
 # Generate summary and print it
 {
