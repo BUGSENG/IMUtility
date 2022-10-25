@@ -13,7 +13,7 @@ usage() {
 
 [[ $# -eq 5 ]] || usage
 
-echo "PR HEAD: $4, PR BASE: ${base_pr_sha:-undefined}"
+echo "#2 PR HEAD: $4, PR BASE: ${pr_base_sha:-undefined}"
 
 results_root=$1
 current_job_id=$2
@@ -32,7 +32,7 @@ chmod -R g+w "${current_dir}"
 
 last_dir="${results_root}/last"
 if [ "${is_pr}" = 'true' ]; then
-    last_dir="${commits_dir}/${base_pr_sha}"
+    last_dir="${commits_dir}/${pr_base_sha}"
 fi
 
 last_job_id=
