@@ -32,6 +32,8 @@ scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECLAIR_REPORT_HOST_SCP}${PROJECT_AR
 # Send the script to tag databases, create symlinks and badges
 scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
+echo "PR HEAD: ${GITHUB_SHA}, PR BASE: ${BASE_PR_SHA}"
+
 ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} base_pr_sha=${BASE_PR_SHA} \
 ${PROJECT_ARTIFACTS_PATH}/update.sh \
 ${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA} ${IS_PR:-false}" \

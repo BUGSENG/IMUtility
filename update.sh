@@ -13,6 +13,8 @@ usage() {
 
 [[ $# -eq 5 ]] || usage
 
+echo "PR HEAD: $4, PR BASE: ${base_pr_sha:-undefined}"
+
 results_root=$1
 current_job_id=$2
 job_headline=$3
