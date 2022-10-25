@@ -30,7 +30,7 @@ chmod -R g+w "${current_dir}"
 
 last_dir="${results_root}/last"
 if [ "${is_pr}" = 'true' ]; then
-    last_dir="${results_root}/commits/${base_pr_sha}"
+    last_dir="${commits_dir}/${base_pr_sha}"
 fi
 
 last_job_id=
