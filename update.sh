@@ -25,7 +25,7 @@ commits_dir=${results_root}/commits
 mkdir -p "${commits_dir}"
 
 # The group where eclair_report runs must be in this file's group
-chmod g+w "${current_db}"
+chmod -R g+w "${current_dir}"
 
 last_dir=${results_root}/last
 last_job_id=
