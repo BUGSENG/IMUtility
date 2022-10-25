@@ -35,6 +35,7 @@ jobs:
 
         ANALYSIS_OUTPUT_PATH="ECLAIR/out"
         if [ "${IS_PR}" = 'true' ]; then
+            ls ..
             ../${PR_HEAD_SHA}/analyze.sh
             ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
         else
