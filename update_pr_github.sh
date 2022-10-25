@@ -34,9 +34,9 @@ base_dir="${commits_dir}/${pr_base_sha}"
 base_job_id=
 [[ ! -d "${base_dir}" ]] || base_job_id=$(basename "$(realpath "${base_dir}")")
 # For PRs, the base db is copied in the current PR's subdir, to avoid altering it
+pr_base_db_name="PROJECT_base.ecd"
 cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
 pr_base_db="${pr_current_dir}/${pr_base_db_name}"
-pr_base_db_name="PROJECT_base.ecd"
 
 # The group where eclair_report runs must be in this file's group
 chmod g+w "${pr_db}" "${pr_base_db}"
