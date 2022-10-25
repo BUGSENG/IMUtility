@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 # Set variables
 #ECLAIR_REPORT_USER="github"
-#ECLAIR_REPORT_HOST="eclairit.com"
+ECLAIR_REPORT_HOST="eclairit.com:3787"
 ECLAIR_REPORT_HOST_SCP=""
 ECLAIR_REPORT_HOST_SH="sh -c"
 ARTIFACTS_ROOT="/home/github/public"
@@ -23,16 +23,6 @@ scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECLAIR_REPORT_HOST_SCP}${PROJECT_AR
 # Send the script to tag databases, create symlinks and badges
 scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
-${ECLAIR_REPORT_HOST_SH} "IS_PR=${IS_PR} BASE_PR_SHA=${BASE_PR_SHA} ${PROJECT_ARTIFACTS_PATH}/update.sh ${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_SHA}"
-
-# Publish ECLAIR report links
-echo "# ECLAIR analysis summary" >>"${GITHUB_STEP_SUMMARY}"
-# Previous
-echo "[![ECLAIR prev](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/prev/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"
-# Current
-echo "[![ECLAIR current](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"
-# Next (missing)
-echo "[![ECLAIR next](https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/badge.svg)]\
-(https://eclairit.com:3787/fs${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/next/PROJECT.ecd)" >>"${GITHUB_STEP_SUMMARY}"
+${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} ${PROJECT_ARTIFACTS_PATH}/update.sh \
+${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA}" \
+    >>"${GITHUB_STEP_SUMMARY}"
