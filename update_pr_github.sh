@@ -97,7 +97,7 @@ EOF
 if [[ -n "${base_job_id}" ]]; then
 
     # For PRs, the base db is copied in the current PR's subdir, to avoid altering it
-    cp "${base_db}" "${pr_current_dir}/${pr_base_db_name}"
+    cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
     base_db="${pr_current_dir}/${pr_base_db_name}"
 
     # Tag previous and current databases
