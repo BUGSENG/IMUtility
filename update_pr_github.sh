@@ -47,15 +47,13 @@ generate_index_pr() {
     local base_link
 
     head_dir=$1
-    base_dir=$(basename "$(realpath "${head_dir}/prev")")
+    base_dir=$(basename "$(realpath "${head_dir}/base")")
 
     if [[ -d ${base_dir} ]]; then
-        counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">previous database</a>)</p>
-                    <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">current database</a>)</p>"
-        base_link="<a href=\"../../${base_dir}/index.html\">Previous job</a>, "
+        counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">PR base database</a>)</p>
+                    <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">PR head database</a>)</p>"
+        base_link="<p><a href=\"base/index.html\">PR base job</a></p>"
     fi
-
-    pr_db_msg="<a href=\"PROJECT.ecd\">current database</a>)</p>"
 
     cat <<EOF
     <!DOCTYPE html>
@@ -73,12 +71,10 @@ generate_index_pr() {
         </a>
         <span>${job_headline}: ECLAIR job #${current_job_id}</span>
     </div>
-    ${pr_db_msg}
+    <h1>Pull request from some ref</h1>
     ${counts_msg}
     <br>
-    <p>
-        ${base_link}<a href="../..">Jobs</a>
-    </p>
+    ${base_link}
     <div class="footer"><div>
         <a href="http://bugseng.com" target="_blank"><img src="/rsrc/bugseng.png" alt="BUGSENG">
             <span class="tagline">software verification done right.</span>
