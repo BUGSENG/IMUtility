@@ -67,13 +67,11 @@ ln -sfn "${current_job_id}" "${results_root}/last"
 ln -sfn "${current_job_id}" "${commits_dir}/${commit_id}"
 
 # Generate summary and print it
-ECLAIR_REPORT_HOST="eclairit.com" # TODO: pass this as a variable
 {
     echo "# ECLAIR analysis summary:"
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
-    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}:3787/fs${current_dir}/index.html)"
-    echo "*****************************************************"
+    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${current_dir}/index.html)"
 } >>"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"
 
@@ -100,7 +98,7 @@ generate_index() {
         echo "<title>${job_headline}: ECLAIR job #${current_job_id}</title>"
         echo "</head>"
         echo "<body>"
-        echo "<h1>ECLAIR job #${current_job_id} for ${job_headline}</h1>"
+        echo "<h1>${job_headline}: ECLAIR job #${current_job_id}</h1>"
 
         if [[ -d ${prev_dir} ]]; then
             echo "<p>Fixed reports: ${fixed_reports} (<a href=\"${previous_db}\">previous database</a>)</p>"

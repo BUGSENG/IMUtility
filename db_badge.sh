@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 
 # Set variables
 #ECLAIR_REPORT_USER="github"
-#ECLAIR_REPORT_HOST="eclairit.com"
+ECLAIR_REPORT_HOST="eclairit.com:3787"
 ECLAIR_REPORT_HOST_SCP=""
 ECLAIR_REPORT_HOST_SH="sh -c"
 ARTIFACTS_ROOT="/home/github/public"
@@ -21,7 +21,7 @@ ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
 scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
 
 # Send the script to tag databases, create symlinks and badges
-scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
+scp update.sh "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} ${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
 ${ECLAIR_REPORT_HOST_SH} "${PROJECT_ARTIFACTS_PATH}/update.sh \
 ${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA}" \
