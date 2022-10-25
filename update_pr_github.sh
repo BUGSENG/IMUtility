@@ -21,7 +21,7 @@ pr_base_sha=$5
 
 commits_dir="${results_root}/commits"
 
-pr_dir="${results_root}/pr/"
+pr_dir="${results_root}/pr"
 pr_current_dir="${pr_dir}/${current_job_id}"
 pr_db="${pr_current_dir}/PROJECT.ecd"
 pr_index="${pr_current_dir}/index.html"
@@ -132,3 +132,12 @@ ln -sfn "${current_job_id}" "${results_root}/last"
 
 # Add a link relating commit id to last build done for it
 ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
+
+# Generate summary and print it (Github-specific)
+{
+    echo "# ECLAIR analysis summary:"
+    printf "Fixed reports: %d\n" "${fixed_reports}"
+    printf "New reports: %d\n" "${new_reports}"
+    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${pr_index})"
+} >>"${pr_dir}/summary.txt"
+cat "${pr_dir}/summary.txt"
