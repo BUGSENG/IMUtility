@@ -34,13 +34,13 @@ jobs:
         ../prepare.sh
 
         ANALYSIS_OUTPUT_PATH="ECLAIR/out"
-        if [ "${IS_PR} = 'true' ]; then
-          ./${PR_HEAD_SHA}/analyze.sh
-          ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
+        if [ "${IS_PR}" = 'true' ]; then
+            ./${PR_HEAD_SHA}/analyze.sh
+            ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
         else
-          ./analyze.sh
+            ./analyze.sh
         fi
-        ../tag_db.sh ${ANALYSIS_OUTPUT_PATH}
+        ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}"
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh
