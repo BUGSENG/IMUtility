@@ -90,6 +90,7 @@ generate_index() {
     next_dir="${current_dir}/next"
     index_file="${current_dir}/index.html"
     previous_db="${fs}${prev_dir}/PROJECT.ecd"
+    current_db="${fs}${current_db}"
 
     {
         echo "<!DOCTYPE html>"
@@ -116,7 +117,7 @@ generate_index() {
         echo "<a href=\"${fs}${next_dir}/index.html\">Next job</a>"
         if [[ -d ${prev_dir} ]]; then
             echo ", "
-            echo "<a href=\"${fs}${results_root}\">Jobs</a>"
+            echo "<a href=\"${fs}${results_root}/\">Jobs</a>"
         fi
         echo "</p>"
 

@@ -1,6 +1,7 @@
--enable=MC3R1
+-enable=MC3R1.D4.4
 -enable=MC3.R1.1
--enable=NC3.2.2.h
+-enable=MC3R1.R10.1
+-enable=MC3R1.R10.4
 
 #-eval_file=gcc-x86_64-7.5.0.ecl
 
