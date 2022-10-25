@@ -25,14 +25,16 @@ JOB_ID="${GITHUB_RUN_NUMBER}"
 ARTIFACTS_ROOT="/home/github/public"
 PROJECT_ARTIFACTS_PATH="${ARTIFACTS_ROOT}/${PROJECT_PATH}"'.ecdf'
 
-# create a directory for the analysis results
-
-${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
-# Transfer the database to eclair_report_host
 ECD_DESTINATION="${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
 if [ "${IS_PR}" = 'true' ]; then
+    # create a (pr) directory for the analysis results
+    ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/pr/${JOB_ID}/"
     ECD_DESTINATION="${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/pr/${JOB_ID}/"
+else
+    # create a directory for the analysis results
+    ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
 fi
+# Transfer the database to eclair_report_host
 scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECD_DESTINATION}"
 
 # Send the script to tag databases, create symlinks and badges
