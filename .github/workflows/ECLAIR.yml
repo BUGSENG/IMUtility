@@ -44,10 +44,18 @@ jobs:
         fi
         PR_BASE_SHA=${PR_BASE_SHA} ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}"
     - name: Upload SARIF
+      if: ${{ github.event_name != 'pull_request' }}
       run: |
         ./ECLAIR/upload.sh
     - name: Upload Artifact
+      if: ${{ github.event_name != 'pull_request' }}
       uses: actions/upload-artifact@v3
       with:
         name: artifacts
         path: ECLAIR/out
+    - name: Upload PR Artifact
+      if: ${{ github.event_name == 'pull_request' }}
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: ${{ github.event.pull_request.head.sha }}/ECLAIR/out
