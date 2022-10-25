@@ -39,15 +39,9 @@ base_job_id=
 # Generate a file index.html for PRs
 generate_index_pr() {
 
-    local head_dir
-    local base_dir
-
     # HTML elements
     local counts_msg
     local base_link
-
-    head_dir=$1
-    base_dir=$(basename "$(realpath "${head_dir}/base")")
 
     if [[ -d ${base_dir} ]]; then
         counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">PR base database</a>)</p>
@@ -111,7 +105,7 @@ if [[ -n "${base_job_id}" ]]; then
     ln -s "../../${base_job_id}" "${pr_current_dir}/base"
 
     # Generate index for the PR
-    generate_index_pr "${pr_current_dir}" >"${pr_index}"
+    generate_index_pr >"${pr_index}"
 else
     # No base commit analysis found
     # TODO: what to do?
