@@ -7,34 +7,94 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID IS_PR" >&2
+    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID" >&2
     exit 2
 }
 
-[[ $# -eq 5 ]] || usage
+[[ $# -eq 4 ]] || usage
 
 results_root=$1
 current_job_id=$2
 job_headline=$3
 commit_id=$4
-is_pr=$5
 
-current_dir=${results_root}/${current_job_id}
-current_db=${current_dir}/PROJECT.ecd
-commits_dir=${results_root}/commits
+current_dir="${results_root}/${current_job_id}"
+current_db="${current_dir}/PROJECT.ecd"
+current_index="${current_dir}/index.html"
+commits_dir="${results_root}/commits"
 
 mkdir -p "${commits_dir}"
 
 # The group where eclair_report runs must be in this file's group
-chmod -R g+w "${current_dir}"
+chmod -R g+w "${current_db}"
 
-last_dir="${results_root}/last"
-if [ "${is_pr}" = 'true' ]; then
-    last_dir="${commits_dir}/${pr_base_sha}"
-fi
-
+last_dir=${results_root}/last
 last_job_id=
 [[ ! -d "${last_dir}" ]] || last_job_id=$(basename "$(realpath "${last_dir}")")
+
+# Generate a file index.html to browse the analysis
+generate_index() {
+
+    local current_dir
+    local prev_dir
+    local next_dir
+
+    # HTML elements
+    local counts_msg
+    local prev_link
+    local next_link
+
+    current_dir=$1
+    prev_dir="${current_dir}/prev"
+    next_dir="${current_dir}/next"
+
+    if [[ -d ${prev_dir} ]]; then
+        counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"prev/PROJECT.ecd\">previous database</a>)</p>
+                    <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">current database</a>)</p>"
+        prev_link="<a href=\"prev/index.html\">Previous job</a>, "
+    fi
+
+    if [[ -d ${next_dir} ]]; then
+        current_db_msg="<a href=\"PROJECT.ecd\">current database</a>)</p>"
+        next_link="<a href=\"next/index.html\">Next job</a>, "
+    fi
+
+    cat <<EOF
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+    <meta charset="utf-8">
+    <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
+    <title>${job_headline}: ECLAIR job #${current_job_id}</title>
+    </head>
+    <body>
+
+    <div class="header">
+        <a href="http://bugseng.com/eclair" target="_blank">
+            <img src="/rsrc/eclair.png" alt="ECLAIR">
+        </a>
+        <span>${job_headline}: ECLAIR job #${current_job_id}</span>
+    </div>
+    ${current_db_msg}
+    ${counts_msg}
+    <br>
+    <p>
+        ${prev_link}${next_link}<a href="../">Jobs</a>
+    </p>
+    <div class="footer"><div>
+        <a href="http://bugseng.com" target="_blank"><img src="/rsrc/bugseng.png" alt="BUGSENG">
+            <span class="tagline">software verification done right.</span>
+        </a>
+        <br>
+        <span class="copyright">
+            The design of this web resource is Copyright © 2010-2022 BUGSENG srl. All rights reserved worldwide.
+        </span>
+    </div></div>
+
+    </body>
+    </html>
+EOF
+}
 
 if [[ -n "${last_job_id}" ]]; then
     last_db=${last_dir}/PROJECT.ecd
@@ -45,9 +105,7 @@ if [[ -n "${last_job_id}" ]]; then
 
     # Count reports
     fixed_reports=$(${eclair_report} -db="${last_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
-    echo "${fixed_reports}" >"${current_dir}/fixed_reports.txt"
     new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
-    echo "${new_reports}" >"${current_dir}/new_reports.txt"
 
     # Generate badge for the current run
     anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
@@ -58,11 +116,18 @@ if [[ -n "${last_job_id}" ]]; then
     # Add link to next run of last run
     ln -s "../${current_job_id}" "${last_dir}/next"
 
+    # Generate index for the current job
+    generate_index "${current_dir}" >"${current_index}"
+
+    # Re-generate index for the previous job
+    generate_index "${current_dir}/prev" >"${current_dir}/prev/index.html"
+
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
     anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
-    # Write report count to file
-    echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports.txt"
+
+    # Generate index for the current job
+    generate_index "${current_dir}" >"${current_index}"
 fi
 
 # Update last symlink
@@ -71,63 +136,11 @@ ln -sfn "${current_job_id}" "${results_root}/last"
 # Add a link relating commit id to last build done for it
 ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
-# Generate summary and print it
+# Generate summary and print it (Github-specific)
 {
     echo "# ECLAIR analysis summary:"
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
-    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${current_dir}/index.html)"
+    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${current_index})"
 } >>"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"
-
-# Generate a file index.html to browse the analysis
-generate_index() {
-    local prev_dir
-    local next_dir
-    local index_file
-    local previous_db
-    local fs
-
-    fs="/fs"
-    prev_dir="${current_dir}/prev"
-    next_dir="${current_dir}/next"
-    index_file="${current_dir}/index.html"
-    previous_db="${fs}${prev_dir}/PROJECT.ecd"
-    current_db="${fs}${current_db}"
-
-    {
-        echo "<!DOCTYPE html>"
-        echo "<html lang=\"en\">"
-        echo "<head>"
-        echo "<meta charset=\"utf-8\">"
-        echo "<title>${job_headline}: ECLAIR job #${current_job_id}</title>"
-        echo "</head>"
-        echo "<body>"
-        echo "<h1>${job_headline}: ECLAIR job #${current_job_id}</h1>"
-
-        if [[ -d ${prev_dir} ]]; then
-            echo "<p>Fixed reports: ${fixed_reports} (<a href=\"${previous_db}\">previous database</a>)</p>"
-            echo "<p>New reports: ${new_reports} (<a href=\"${current_db}\">current database</a>)</p>"
-        fi
-
-        echo "<hr>"
-
-        echo "<p>"
-        if [[ -d ${prev_dir} ]]; then
-            echo "<a href=\"${fs}${prev_dir}/index.html\">Previous job</a>"
-            echo ", "
-        fi
-        echo "<a href=\"${fs}${next_dir}/index.html\">Next job</a>"
-        if [[ -d ${prev_dir} ]]; then
-            echo ", "
-            echo "<a href=\"${fs}${results_root}/\">Jobs</a>"
-        fi
-        echo "</p>"
-
-        echo "</body>"
-        echo "</html>"
-
-    } >>"${index_file}"
-}
-
-generate_index
