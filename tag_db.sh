@@ -18,13 +18,18 @@ ANALYSIS_OUTPUT_PATH=$1
 ECLAIR_REPORT_HOST="eclairit.com:3787"
 ECLAIR_REPORT_HOST_SCP=""
 ECLAIR_REPORT_HOST_SH="sh -c"
-ARTIFACTS_ROOT="/home/github/public"
+
 PROJECT_PATH="${GITHUB_REPOSITORY}"
 JOB_ID="${GITHUB_RUN_NUMBER}"
 
+ARTIFACTS_ROOT="/home/github/public"
 PROJECT_ARTIFACTS_PATH="${ARTIFACTS_ROOT}/${PROJECT_PATH}"'.ecdf'
+if [ "${IS_PR}" = 'true' ]; then
+    PROJECT_ARTIFACTS_PATH="${PROJECT_ARTIFACTS_PATH}/pr"
+fi
 
 # create a directory for the analysis results
+
 ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
 # Transfer the database to eclair_report_host
 scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
