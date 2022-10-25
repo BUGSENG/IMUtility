@@ -26,12 +26,21 @@ jobs:
         set -e
         cd ECLAIR
         gh_ref=$(echo $GITHUB_REF_NAME | sed 's,/,_,')
-        # PR base commit sha (should already have and .ecd)
+
+        # PR base and head commits SHAs
         BASE_PR_SHA=${{ github.event.pull_request.base.sha }}
+        PR_HEAD_SHA=${{ github.event.pull_request.head.sha }}
 
         ../prepare.sh
-        ./analyze.sh
-        ../tag_db.sh
+
+        ANALYSIS_OUTPUT_PATH="ECLAIR/out"
+        if [ "${IS_PR} = 'true' ]; then
+          ./${PR_HEAD_SHA}/analyze.sh
+          ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
+        else
+          ./analyze.sh
+        fi
+        ../tag_db.sh ${ANALYSIS_OUTPUT_PATH}
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh

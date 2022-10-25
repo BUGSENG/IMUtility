@@ -4,6 +4,15 @@ set -e
 
 cd "$(dirname "$0")"
 
+usage() {
+    echo "Usage: $0 ANALYSIS_OUTPUT_PATH" >&2
+    exit 2
+}
+
+[ $# -eq 1 ] || usage
+
+ANALYSIS_OUTPUT_PATH=$1
+
 # Set variables
 #ECLAIR_REPORT_USER="github"
 ECLAIR_REPORT_HOST="eclairit.com:3787"
@@ -12,7 +21,7 @@ ECLAIR_REPORT_HOST_SH="sh -c"
 ARTIFACTS_ROOT="/home/github/public"
 PROJECT_PATH="${GITHUB_REPOSITORY}"
 JOB_ID="${GITHUB_RUN_NUMBER}"
-ANALYSIS_OUTPUT_PATH="ECLAIR/out/"
+
 PROJECT_ARTIFACTS_PATH="${ARTIFACTS_ROOT}/${PROJECT_PATH}"'.ecdf'
 
 # create a directory for the analysis results
