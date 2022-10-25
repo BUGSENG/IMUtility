@@ -34,7 +34,7 @@ scp update.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
 if [ "${IS_PR}" = 'true' ]; then
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
-${PROJECT_ARTIFACTS_PATH}/update.sh \
+${PROJECT_ARTIFACTS_PATH}/update_pr_github.sh \
 ${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA} ${PR_BASE_SHA}" \
         >>"${GITHUB_STEP_SUMMARY}"
 else
