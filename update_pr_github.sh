@@ -7,17 +7,16 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID PR_BASE_SHA" >&2
+    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE PR_BASE_SHA" >&2
     exit 2
 }
 
-[[ $# -eq 5 ]] || usage
+[[ $# -eq 4 ]] || usage
 
 results_root=$1
 current_job_id=$2
 job_headline=$3
-commit_id=$4
-pr_base_sha=$5
+pr_base_sha=$4
 
 commits_dir="${results_root}/commits"
 
@@ -126,12 +125,6 @@ else
     # Generate index for the current job
     generate_index "${pr_dir}" >"${pr_index}"
 fi
-
-# Update last symlink
-ln -sfn "${current_job_id}" "${results_root}/last"
-
-# Add a link relating commit id to last build done for it
-ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
 # Generate summary and print it (Github-specific)
 {

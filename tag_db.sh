@@ -24,9 +24,6 @@ JOB_ID="${GITHUB_RUN_NUMBER}"
 
 ARTIFACTS_ROOT="/home/github/public"
 PROJECT_ARTIFACTS_PATH="${ARTIFACTS_ROOT}/${PROJECT_PATH}"'.ecdf'
-if [ "${IS_PR}" = 'true' ]; then
-    PROJECT_ARTIFACTS_PATH="${PROJECT_ARTIFACTS_PATH}/pr"
-fi
 
 # create a directory for the analysis results
 
@@ -40,7 +37,7 @@ scp update.sh update_pr_github.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_
 if [ "${IS_PR}" = 'true' ]; then
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update_pr_github.sh \
-${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA} ${PR_BASE_SHA}" \
+${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_SHA}" \
         >>"${GITHUB_STEP_SUMMARY}"
 else
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
