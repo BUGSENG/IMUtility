@@ -112,7 +112,7 @@ if [[ -n "${base_job_id}" ]]; then
     anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${pr_current_dir}/badge.svg"
 
     # Add link to base commit of the current run
-    ln -s "../../${base_job_id}" "${pr_db}/base"
+    ln -s "../../${base_job_id}" "${pr_current_dir}/base"
 
     # Generate index for the PR
     generate_index_pr "${pr_current_dir}" >"${pr_index}"
