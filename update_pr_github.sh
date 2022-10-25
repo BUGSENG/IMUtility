@@ -27,7 +27,7 @@ pr_index="${pr_current_dir}/index.html"
 pr_base_db_name="PROJECT_base.ecd"
 
 mkdir -p "${commits_dir}"
-mkdir -p "${pr_dir}"
+mkdir -p "${pr_current_dir}"
 
 # The group where eclair_report runs must be in this file's group
 chmod -R g+w "${pr_db}"
@@ -109,7 +109,7 @@ if [[ -n "${base_job_id}" ]]; then
     new_reports=$(${eclair_report} -db="${pr_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
 
     # Generate badge for the current run
-    anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${pr_dir}/badge.svg"
+    anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${pr_current_dir}/badge.svg"
 
     # Add link to base commit of the current run
     ln -s "../../${base_job_id}" "${pr_db}/base"
@@ -120,10 +120,10 @@ else
     # No base commit analysis found
     # TODO: what to do?
     new_reports=$(${eclair_report} -db="${pr_db}" '-print="",reports_count()')
-    anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${pr_dir}/badge.svg"
+    anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${pr_current_dir}/badge.svg"
 
     # Generate index for the current job
-    generate_index "${pr_dir}" >"${pr_index}"
+    generate_index "${pr_current_dir}" >"${pr_index}"
 fi
 
 # Generate summary and print it (Github-specific)
@@ -132,5 +132,5 @@ fi
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
     echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${pr_index})"
-} >>"${pr_dir}/summary.txt"
-cat "${pr_dir}/summary.txt"
+} >>"${pr_current_dir}/summary.txt"
+cat "${pr_current_dir}/summary.txt"
