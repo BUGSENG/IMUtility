@@ -26,6 +26,9 @@ pr_current_dir="${pr_dir}/${current_job_id}"
 pr_db="${pr_current_dir}/PROJECT.ecd"
 pr_index="${pr_current_dir}/index.html"
 
+mkdir -p "${commits_dir}"
+mkdir -p "${pr_current_dir}"
+
 # PR base variables
 base_dir="${commits_dir}/${pr_base_sha}"
 base_job_id=
@@ -34,9 +37,6 @@ base_job_id=
 cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
 pr_base_db="${pr_current_dir}/${pr_base_db_name}"
 pr_base_db_name="PROJECT_base.ecd"
-
-mkdir -p "${commits_dir}"
-mkdir -p "${pr_current_dir}"
 
 # The group where eclair_report runs must be in this file's group
 chmod g+w "${pr_db}" "${pr_base_db}"
