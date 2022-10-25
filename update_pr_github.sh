@@ -20,21 +20,26 @@ pr_base_sha=$4
 
 commits_dir="${results_root}/commits"
 
+# PR HEAD variables
 pr_dir="${results_root}/pr"
 pr_current_dir="${pr_dir}/${current_job_id}"
 pr_db="${pr_current_dir}/PROJECT.ecd"
 pr_index="${pr_current_dir}/index.html"
+
+# PR base variables
+base_dir="${commits_dir}/${pr_base_sha}"
+base_job_id=
+[[ ! -d "${base_dir}" ]] || base_job_id=$(basename "$(realpath "${base_dir}")")
+# For PRs, the base db is copied in the current PR's subdir, to avoid altering it
+cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
+pr_base_db="${pr_current_dir}/${pr_base_db_name}"
 pr_base_db_name="PROJECT_base.ecd"
 
 mkdir -p "${commits_dir}"
 mkdir -p "${pr_current_dir}"
 
 # The group where eclair_report runs must be in this file's group
-chmod -R g+w "${pr_db}"
-
-base_dir="${commits_dir}/${pr_base_sha}"
-base_job_id=
-[[ ! -d "${base_dir}" ]] || base_job_id=$(basename "$(realpath "${base_dir}")")
+chmod g+w "${pr_db}" "${pr_base_db}"
 
 # Generate a file index.html for PRs
 generate_index_pr() {
@@ -86,16 +91,12 @@ EOF
 
 if [[ -n "${base_job_id}" ]]; then
 
-    # For PRs, the base db is copied in the current PR's subdir, to avoid altering it
-    cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
-    base_db="${pr_current_dir}/${pr_base_db_name}"
-
     # Tag previous and current databases
     ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
-        -tag_diff="'${base_db}','${pr_db}'"
+        -tag_diff="'${pr_base_db}','${pr_db}'"
 
     # Count reports
-    fixed_reports=$(${eclair_report} -db="${base_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    fixed_reports=$(${eclair_report} -db="${pr_base_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
     new_reports=$(${eclair_report} -db="${pr_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
 
     # Generate badge for the current run
