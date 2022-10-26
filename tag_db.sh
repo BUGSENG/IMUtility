@@ -38,7 +38,7 @@ BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
 # Badge label name
 BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"
 
-ECD_DESTINATION=${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/
+ECD_DESTINATION=${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${BRANCH}/${JOB_ID}/
 if [ "${IS_PR}" = 'true' ]; then
     # create a (pr) directory for the analysis results
     ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/pr/${JOB_ID}/"
