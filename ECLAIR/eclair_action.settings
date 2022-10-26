@@ -16,4 +16,4 @@ BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
 # Extract PR number from "refs/pull/<prnum>/merge"
 PR_ID=${BRANCH}
 JOB_ID=${GITHUB_RUN_NUMBER}
-BADGE_LABEL="ECLAIR ${BRANCH} #${job_id}"
+BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"
