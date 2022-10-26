@@ -1,36 +1,39 @@
 #!/bin/sh
 
 set -e
+set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT VARIANT JOB_ID JOB_HEADLINE COMMIT_ID" >&2
+    echo "Usage: $0 RESULTS_ROOT BRANCH BADGE_LABEL JOB_ID JOB_HEADLINE COMMIT_ID" >&2
     exit 2
 }
 
-[ $# -eq 5 ] || usage
+[ $# -eq 6 ] || usage
 
 results_root=$1
-variant=$2
-current_job_id=$3
-job_headline=$4
-commit_id=$5
+branch=$2
+badge_label=$3
+current_job_id=$4
+job_headline=$5
+commit_id=$6
 
-current_dir=${results_root}/${current_job_id}
-current_db=${current_dir}/PROJECT.ecd
-current_index=${current_dir}/index.html
-previous_index=${current_dir}/prev/index.html
-commits_dir=${results_root}/commits
+results_branch_dir="${results_root}/${branch}"
+current_dir="${results_branch_dir}/${current_job_id}"
+current_db="${current_dir}/PROJECT.ecd"
+current_index="${current_dir}/index.html"
+previous_index="${current_dir}/prev/index.html"
+commits_dir="${results_root}/commits"
 
 mkdir -p "${commits_dir}"
 
 # The group where eclair_report runs must be in this file's group
 chmod g+w "${current_db}"
 
-last_dir=${results_root}/last
+last_dir=${results_branch_dir}/last
 last_job_id=
 [ ! -d "${last_dir}" ] || last_job_id=$(basename "$(realpath "${last_dir}")")
 
@@ -38,7 +41,7 @@ last_job_id=
 generate_index() {
 
     job_id=$1
-    job_dir="${results_root}/${job_id}"
+    job_dir="${results_branch_dir}/${job_id}"
     prev_dir="${job_dir}/prev"
     next_dir="${job_dir}/next"
 
@@ -47,6 +50,7 @@ generate_index() {
     counts_msg=
     prev_link=
     next_link=
+    latest_db_msg=
 
     if [ -d "${prev_dir}" ]; then
         fixed_reports=$(cat "${job_dir}/fixed_reports.txt")
@@ -75,6 +79,17 @@ EOF
 <a href="next/index.html">Next job</a>, 
 EOF
         )
+        latest_db_msg=$(
+            cat <<EOF
+<p>Browse the <a href="../last/index.html">latest job</a></p>
+EOF
+        )
+    else
+        latest_db_msg=$(
+            cat <<EOF
+<p>This is the latest job.</p>
+EOF
+        )
     fi
 
     cat <<EOF
@@ -83,16 +98,17 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline} (${variant}): ECLAIR job #${job_id}</title>
+  <title>${job_headline} - ECLAIR job #${job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline} (${variant}): ECLAIR job #${job_id}</span>
+   <span>${job_headline} - ECLAIR job #${job_id}</span>
   </div>
   ${counts_msg}
+  ${latest_db_msg}
   <hr>
   <p>
    ${prev_link}${next_link}<a href="../">Jobs</a>
@@ -126,7 +142,7 @@ if [ -n "${last_job_id}" ]; then
     echo "${new_reports}" >"${current_dir}/new_reports.txt"
 
     # Generate badge for the current run
-    anybadge -o --label="ECLAIR ${variant} #${current_job_id}" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="${badge_label}" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
 
     # Add link to previous run of current run
     ln -s "../${last_job_id}" "${current_dir}/prev"
@@ -143,25 +159,26 @@ if [ -n "${last_job_id}" ]; then
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    echo "${new_reports}" >"${results_root}/${current_job_id}/new_reports.txt"
+    echo "${new_reports}" >"${results_branch_dir}/${current_job_id}/new_reports.txt"
 
-    anybadge -o --label="ECLAIR ${variant} #${current_job_id}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="${badge_label}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
 
     # Generate index for the current job
     generate_index "${current_job_id}" >"${current_index}"
 fi
 
 # Update last symlink
-ln -sfn "${current_job_id}" "${results_root}/last"
+ln -sfn "${current_job_id}" "${last_dir}"
 
 # Add a link relating commit id to last build done for it
 ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
 # Generate summary and print it (Github-specific)
+# ANALYSIS_HOST is passed from tag_db.sh
 {
     echo "# ECLAIR analysis summary:"
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
-    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${current_index})"
+    echo "[Browse analysis](${ANALYSIS_HOST}${current_index})"
 } >>"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"

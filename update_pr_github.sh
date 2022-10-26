@@ -120,12 +120,13 @@ else
 fi
 
 # Generate summary and print it (Github-specific)
+# ANALYSIS_HOST is passed from tag_db.sh
 {
     echo '[![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair)'
     echo "# ECLAIR analysis summary:"
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
-    echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${pr_index})"
+    echo "[Browse analysis](${ANALYSIS_HOST}${pr_index})"
 } >"${pr_current_dir}/summary.txt"
 cat "${pr_current_dir}/summary.txt"
 
