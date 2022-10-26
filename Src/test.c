@@ -4,5 +4,5 @@ void f()
     signed char sc;
     char c;
     int i;
-    // i = (c) ? : sc;
+    i = (c) ?: sc;
 }
