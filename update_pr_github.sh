@@ -11,14 +11,14 @@ usage() {
     exit 2
 }
 
-[[ $# -eq 6 ]] || usage
+[[ "$#" -eq 6 ]] || usage
 
-results_root=$1
-pr_number=$2
-current_job_id=$3
-job_headline=$4
-pr_headline=$5
-pr_base_sha=$6
+results_root="$1"
+pr_number="$2"
+current_job_id="$3"
+job_headline="$4"
+pr_headline="$5"
+pr_base_sha="$6"
 
 commits_dir="${results_root}/commits"
 
@@ -126,7 +126,7 @@ fi
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
     echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${pr_index})"
-} >>"${pr_current_dir}/summary.txt"
+} >"${pr_current_dir}/summary.txt"
 cat "${pr_current_dir}/summary.txt"
 
 # Create a comment on the PR

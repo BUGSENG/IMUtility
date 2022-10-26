@@ -11,8 +11,8 @@ usage() {
 
 [ $# -eq 2 ] || usage
 
-ANALYSIS_OUTPUT_PATH=$1
-PR_HEADLINE=$2
+ANALYSIS_OUTPUT_PATH="$1"
+PR_HEADLINE="$2"
 
 # Set variables
 #ECLAIR_REPORT_USER="github"

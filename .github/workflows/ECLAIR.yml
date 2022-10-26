@@ -37,8 +37,8 @@ jobs:
         PR_SRC=${{ github.event.pull_request.head.ref }}
         PR_DEST=${{ github.event.pull_request.base.ref }}
         # Count the # of commits in the PR
-        PR_COMMIT_COUNT=$(git log --oneline ${PR_SRC} ^${PR_DEST} | wc -l)
-        PR_HEADLINE="${PR_SENDER} wants to merge ${PR_COMMIT_COUNT} into ${PR_DEST} from ${PR_SRC}"
+        PR_COMMIT_COUNT=$(git log --oneline ${PR_SRC} ${PR_DEST} | wc -l)
+        PR_HEADLINE="${PR_SENDER} wants to merge ${PR_COMMIT_COUNT} commits into ${PR_DEST} from ${PR_SRC}"
 
         ../prepare.sh
 
