@@ -7,16 +7,17 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT JOB_ID JOB_HEADLINE PR_BASE_SHA" >&2
+    echo "Usage: $0 RESULTS_ROOT PR_NUMBER JOB_ID JOB_HEADLINE PR_BASE_SHA" >&2
     exit 2
 }
 
-[[ $# -eq 4 ]] || usage
+[[ $# -eq 5 ]] || usage
 
 results_root=$1
-current_job_id=$2
-job_headline=$3
-pr_base_sha=$4
+pr_number=$2
+current_job_id=$3
+job_headline=$4
+pr_base_sha=$5
 
 commits_dir="${results_root}/commits"
 
@@ -125,3 +126,11 @@ fi
     echo "[Browse analysis](https://${ECLAIR_REPORT_HOST}/fs${pr_index})"
 } >>"${pr_current_dir}/summary.txt"
 cat "${pr_current_dir}/summary.txt"
+
+# Create a comment on the PR
+repo="${job_headline}"
+gh api \
+    --method POST \
+    -H "Accept: application/vnd.github.raw+json" \
+    "/repos/${repo}/issues/${pr_number}/comments" \
+    -F "${pr_current_dir}/summary.txt"

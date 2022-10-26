@@ -41,9 +41,11 @@ scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECD_DESTINATION}"
 scp update.sh update_pr_github.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
 if [ "${IS_PR}" = 'true' ]; then
+    # Extract PR number from "refs/pull/<prnum>/merge"
+    PR_NUMBER=$(echo "${GITHUB_REF_NAME}" | cut -d / -f 3)
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update_pr_github.sh \
-${PROJECT_ARTIFACTS_PATH} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_SHA}" \
+${PROJECT_ARTIFACTS_PATH} ${PR_NUMBER} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_SHA}" \
         >>"${GITHUB_STEP_SUMMARY}"
 else
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
