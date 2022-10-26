@@ -27,7 +27,7 @@ jobs:
       run: |
         set -e
         cd ECLAIR
-        gh_ref=$(echo $GITHUB_REF_NAME | sed 's,/,_,')
+        gh_ref=$(echo $GITHUB_REF | sed 's,/,_,')
 
         # PR base and head commits SHAs
         PR_BASE_SHA=${{ github.event.pull_request.base.sha }}

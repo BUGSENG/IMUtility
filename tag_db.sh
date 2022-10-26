@@ -42,7 +42,7 @@ scp update.sh update_pr_github.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_
 # Execute it on that host
 if [ "${IS_PR}" = 'true' ]; then
     # Extract PR number from "refs/pull/<prnum>/merge"
-    PR_NUMBER=$(echo "${GITHUB_REF_NAME}" | cut -d / -f 3)
+    PR_NUMBER=$(echo "${GITHUB_REF}" | cut -d / -f 3)
     echo "${PROJECT_ARTIFACTS_PATH} ${PR_NUMBER} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_SHA}"
 
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
@@ -52,6 +52,6 @@ ${PROJECT_ARTIFACTS_PATH} ${PR_NUMBER} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_
 else
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update.sh \
-${PROJECT_ARTIFACTS_PATH} ${GITHUB_REF_NAME} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA}" \
+${PROJECT_ARTIFACTS_PATH} ${GITHUB_REF} ${JOB_ID} ${GITHUB_REPOSITORY} ${GITHUB_SHA}" \
         >>"${GITHUB_STEP_SUMMARY}"
 fi
