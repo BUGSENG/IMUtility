@@ -1,0 +1,19 @@
+CI="github"
+
+ECLAIR_REPORT_USER="github"
+ECLAIR_REPORT_HOST='eclairit.com:3787'
+# Prefix of the analysis index link on eclair report host
+ECLAIR_REPORT_HOST_PREFIX='https://'${ECLAIR_REPORT_HOST}'/fs'
+ECLAIR_REPORT_HOST_SCP=
+ECLAIR_REPORT_HOST_SH='sh -c'
+
+ARTIFACTS_ROOT='/home/github/public'
+UPDATE_SCRIPTS_PATH='ECLAIR'
+REPOSITORY=${GITHUB_REPOSITORY}
+
+# Extract the branch name from "refs/heads/<branch>"
+BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
+# Extract PR number from "refs/pull/<prnum>/merge"
+PR_ID=${BRANCH}
+BADGE_LABEL="ECLAIR ${BRANCH} #${job_id}"
+JOB_ID=${GITHUB_RUN_NUMBER}
