@@ -12,7 +12,7 @@ usage() {
 [ $# -eq 2 ] || usage
 
 # Source variables
-. ./eclair_actions.settings
+. ./eclair_action.settings
 
 # Set this script's variables (using those defined in the .settings file)
 analysis_output_path="$1"
@@ -20,6 +20,7 @@ commit_id="$2"
 
 project_actifacts_path=${ARTIFACTS_ROOT}/${REPOSITORY}'.ecdf'
 # These two variables are passed as env variables from the .yml file
+# Thus, they are either defined or the empty string
 pr_base_commit_id=${PR_BASE_COMMIT_ID}
 pr_headline=${PR_HEADLINE}
 
@@ -40,16 +41,17 @@ scp "${UPDATE_SCRIPTS_PATH}/update_push.sh" \
     "${UPDATE_SCRIPTS_PATH}/update_pull_request.sh" \
     "${ECLAIR_REPORT_HOST_SCP}${project_actifacts_path}"
 # Execute it on that host
-if [ "${IS_PR}" = 'true' ]; then
-    ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
+{
+    if [ "${IS_PR}" = 'true' ]; then
+        ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
 ${project_actifacts_path}/update_pr_github.sh \
 '${CI}' '${project_actifacts_path}' '${JOB_ID}' '${REPOSITORY}' \
-'${PR_ID}' '${pr_base_commit_id}' '${pr_headline}' " \
-        >>"${GITHUB_STEP_SUMMARY}"
-else
-    ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
+'${PR_ID}' '${pr_base_commit_id}' '${pr_headline}' "
+    else
+        ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
 ${project_actifacts_path}/update.sh \
 '${CI}' '${project_actifacts_path}' '${BRANCH}' '${BADGE_LABEL}' \
-'${JOB_ID}' '${REPOSITORY}' '${commit_id}'" \
-        >>"${GITHUB_STEP_SUMMARY}"
-fi
+'${JOB_ID}' '${REPOSITORY}' '${commit_id}'"
+    fi
+
+} >>"${GITHUB_STEP_SUMMARY}"
