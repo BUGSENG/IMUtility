@@ -12,9 +12,19 @@ ARTIFACTS_ROOT=/home/github/public
 REPOSITORY=${GITHUB_REPOSITORY}
 IS_PULL_REQUEST=${IS_PR}
 
-# Extract the branch name from "refs/heads/<branch>"
-BRANCH=${GITHUB_REF#refs/heads/}
-# Extract PR number from "refs/pull/<prnum>/merge"
-PR_ID=$(echo "${GITHUB_REF}" | cut -d / -f 3)
+case "${IS_PULL_REQUEST}" in
+'true')
+    # Extract PR number from "refs/pull/<prnum>/merge"
+    PR_ID=${GITHUB_REF#refs/pulls/}
+    PR_ID=${PR_ID%/merge}
+    ;;
+*)
+    # Extract the branch name from "refs/heads/<branch>"
+    BRANCH=${GITHUB_REF#refs/heads/}
+    ;;
+esac
+PR_ID=${PR_ID:-unknown}
+BRANCH=${BRANCH:-unknown}
+
 JOB_ID=${GITHUB_RUN_NUMBER}
 BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"

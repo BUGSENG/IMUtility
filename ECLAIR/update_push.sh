@@ -176,7 +176,7 @@ ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
 if [ "${ci}" = 'github' ]; then
     # Generate summary and print it (Github-specific)
-    # ANALYSIS_HOST is passed from eclair_action.sh
+    # ANALYSIS_HOST is passed from action.sh
     {
         echo "# ECLAIR analysis summary:"
         printf "Fixed reports: %d\n" "${fixed_reports:-unavailable}"

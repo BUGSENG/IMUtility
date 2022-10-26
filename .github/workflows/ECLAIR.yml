@@ -37,7 +37,7 @@ jobs:
 
         ../prepare.sh
 
-        # Assumes that ./eclair_action.sh runs inside the folder ECLAIR
+        # Assumes that ./action.sh runs inside the folder ECLAIR
         # Therefore the project db is inside ECLAIR/out
         ANALYSIS_OUTPUT_PATH=out
         if [ "${IS_PR}" = 'true' ]; then
@@ -47,7 +47,7 @@ jobs:
             ./analyze.sh
         fi
 
-        ./eclair_action.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA}"
+        ./action.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA}"
     - name: Upload SARIF
       if: ${{ github.event_name != 'pull_request' }}
       run: |
