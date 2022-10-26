@@ -31,6 +31,13 @@ PROJECT_ARTIFACTS_PATH=${ARTIFACTS_ROOT}/${PROJECT_PATH}'.ecdf'
 # Analysis link on eclair report host, for the summary
 ANALYSIS_HOST='https://'${ECLAIR_REPORT_HOST}'/fs'
 
+# Extract PR number from "refs/pull/<prnum>/merge"
+PR_ID=$(echo "${GITHUB_REF}" | cut -d / -f 3)
+# Extract the branch name from "refs/heads/<branch>"
+BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
+# Badge label name
+BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"
+
 ECD_DESTINATION=${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/
 if [ "${IS_PR}" = 'true' ]; then
     # create a (pr) directory for the analysis results
@@ -38,7 +45,7 @@ if [ "${IS_PR}" = 'true' ]; then
     ECD_DESTINATION=${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}/pr/${JOB_ID}/
 else
     # create a directory for the analysis results
-    ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${JOB_ID}/"
+    ${ECLAIR_REPORT_HOST_SH} "mkdir -p ${PROJECT_ARTIFACTS_PATH}/${BRANCH}/${JOB_ID}/"
 fi
 # Transfer the database to eclair_report_host
 scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECD_DESTINATION}"
@@ -47,20 +54,12 @@ scp "${ANALYSIS_OUTPUT_PATH}/PROJECT.ecd" "${ECD_DESTINATION}"
 scp update.sh update_pr_github.sh "${ECLAIR_REPORT_HOST_SCP}${PROJECT_ARTIFACTS_PATH}"
 # Execute it on that host
 if [ "${IS_PR}" = 'true' ]; then
-    # Extract PR number from "refs/pull/<prnum>/merge"
-    PR_ID=$(echo "${GITHUB_REF}" | cut -d / -f 3)
-
     ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ANALYSIS_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update_pr_github.sh \
 '${CI}' '${PROJECT_ARTIFACTS_PATH}' '${JOB_ID}' '${GITHUB_REPOSITORY}' \
 '${PR_ID}' '${PR_BASE_COMMIT_ID}' '${PR_HEADLINE}' " \
         >>"${GITHUB_STEP_SUMMARY}"
 else
-    # Extract the branch name from "refs/heads/<branch>"
-    BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
-    # Badge label name
-    BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"
-
     ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ANALYSIS_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update.sh \
 '${CI}' '${PROJECT_ARTIFACTS_PATH}' '${BRANCH}' '${BADGE_LABEL}' \

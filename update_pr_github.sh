@@ -104,18 +104,18 @@ if [ -n "${base_job_id}" ]; then
     new_reports=$(${eclair_report} -db="${pr_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
 
     # Generate badge for the current run
-    anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${pr_current_dir}/badge.svg"
+    #anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${pr_current_dir}/badge.svg"
 
     # Add link to base commit of the current run
-    ln -s "../../${base_job_id}" "${pr_current_dir}/base"
+    ln -s "../../commits/${pr_base_commit}" "${pr_current_dir}/base"
 
     # Generate index for the PR
     generate_index_pr >"${pr_index}"
 else
     # No base commit analysis found
     # TODO: what to do?
-    new_reports=$(${eclair_report} -db="${pr_db}" '-print="",reports_count()')
-    anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${pr_current_dir}/badge.svg"
+    #new_reports=$(${eclair_report} -db="${pr_db}" '-print="",reports_count()')
+    #anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${pr_current_dir}/badge.svg"
 
     # Generate index for the current job
     generate_index "${pr_current_dir}" >"${pr_index}"
