@@ -51,9 +51,9 @@ generate_index_pr() {
     local base_link
 
     if [[ -d ${base_dir} ]]; then
-        counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">PR base database</a>)</p>
-                    <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">PR head database</a>)</p>"
-        base_link="<p><a href=\"base/index.html\">PR base job</a></p>"
+        counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">Base database</a>)</p>
+                    <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">Merged database</a>)</p>"
+        base_link="<p><a href=\"base/index.html\">Base job</a></p>"
     fi
 
     cat <<EOF
