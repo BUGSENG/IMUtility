@@ -29,6 +29,9 @@ current_index=${current_dir}/index.html
 previous_index=${current_dir}/prev/index.html
 commits_dir=${results_root}/commits
 
+new_reports=
+fixed_reports=
+
 mkdir -p "${commits_dir}"
 
 # The group where eclair_report runs must be in this file's group
@@ -179,8 +182,8 @@ if [ "${ci}" = 'github' ]; then
     # ANALYSIS_HOST is passed from tag_db.sh
     {
         echo "# ECLAIR analysis summary:"
-        printf "Fixed reports: %d\n" "${fixed_reports}"
-        printf "New reports: %d\n" "${new_reports}"
+        printf "Fixed reports: %d\n" "${fixed_reports:-unavailable}"
+        printf "New reports: %d\n" "${new_reports:-unavailable}"
         echo "[Browse analysis](${ANALYSIS_HOST}${current_index})"
     } >>"${current_dir}/summary.txt"
     cat "${current_dir}/summary.txt"
