@@ -8,19 +8,20 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 CI RESULTS_ROOT JOB_ID JOB_HEADLINE PR_ID PR_BASE_COMMIT PR_HEADLINE" >&2
+    echo "Usage: $0 CI RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID PR_ID PR_BASE_COMMIT PR_HEADLINE" >&2
     exit 2
 }
 
-[ $# -eq 7 ] || usage
+[ $# -eq 8 ] || usage
 
 ci="$1"
 results_root="$2"
 pr_id="$3"
 current_job_id="$4"
 job_headline="$5"
-pr_headline="$6"
+commit_id="$6" # Commit id of the (implicit) merge commit created by CI (for future use)
 pr_base_commit="$7"
+pr_headline="$8"
 
 commits_dir=${results_root}/commits
 
@@ -42,7 +43,7 @@ pr_base_db_name='PROJECT_base.ecd'
 cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
 pr_base_db=${pr_current_dir}/${pr_base_db_name}
 
-# The group where eclair_report runs must be in this file's group
+# The group running eclair_report must be in this file's group
 chmod g+w "${pr_db}" "${pr_base_db}"
 
 # Generate a file index.html for PRs

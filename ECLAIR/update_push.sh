@@ -8,7 +8,7 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 CI RESULTS_ROOT BRANCH BADGE_LABEL JOB_ID JOB_HEADLINE COMMIT_ID" >&2
+    echo "Usage: $0 CI RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID BRANCH BADGE_LABEL " >&2
     exit 2
 }
 
@@ -16,11 +16,11 @@ usage() {
 
 ci="$1"
 results_root="$2"
-branch="$3"
-badge_label="$4"
-current_job_id="$5"
-job_headline="$6"
-commit_id="$7"
+current_job_id="$3"
+job_headline="$4"
+commit_id="$5"
+branch="$6"
+badge_label="$7"
 
 results_branch_dir=${results_root}/${branch}
 current_dir=${results_branch_dir}/${current_job_id}
@@ -31,7 +31,7 @@ commits_dir=${results_root}/commits
 
 mkdir -p "${commits_dir}"
 
-# The group where eclair_report runs must be in this file's group
+# The group running eclair_report must be in this file's group
 chmod g+w "${current_db}"
 
 latest_dir=${results_branch_dir}/latest

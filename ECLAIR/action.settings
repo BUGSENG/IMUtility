@@ -1,3 +1,4 @@
+# Fit to repo setup, and add to the ECLAIR folder
 CI=github
 
 ECLAIR_REPORT_USER=github
@@ -8,12 +9,12 @@ ECLAIR_REPORT_HOST_SCP=
 ECLAIR_REPORT_HOST_SH='sh -c'
 
 ARTIFACTS_ROOT=/home/github/public
-UPDATE_SCRIPTS_PATH=
 REPOSITORY=${GITHUB_REPOSITORY}
+IS_PULL_REQUEST=${IS_PR}
 
 # Extract the branch name from "refs/heads/<branch>"
-BRANCH=$(echo "${GITHUB_REF}" | cut -d / -f 3)
+BRANCH=${GITHUB_REF#refs/heads/}
 # Extract PR number from "refs/pull/<prnum>/merge"
-PR_ID=${BRANCH}
+PR_ID=$(echo "${GITHUB_REF}" | cut -d / -f 3)
 JOB_ID=${GITHUB_RUN_NUMBER}
 BADGE_LABEL="ECLAIR ${BRANCH} #${JOB_ID}"
