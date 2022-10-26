@@ -7,17 +7,18 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT PR_NUMBER JOB_ID JOB_HEADLINE PR_BASE_SHA" >&2
+    echo "Usage: $0 RESULTS_ROOT PR_NUMBER JOB_ID JOB_HEADLINE PR_HEADLINE PR_BASE_SHA" >&2
     exit 2
 }
 
-[[ $# -eq 5 ]] || usage
+[[ $# -eq 6 ]] || usage
 
 results_root=$1
 pr_number=$2
 current_job_id=$3
 job_headline=$4
-pr_base_sha=$5
+pr_headline=$5
+pr_base_sha=$6
 
 commits_dir="${results_root}/commits"
 
@@ -71,7 +72,7 @@ generate_index_pr() {
         </a>
         <span>${job_headline}: ECLAIR job #${current_job_id}</span>
     </div>
-    <h1>Pull request from some ref</h1>
+    <h1>${pr_headline}</h1>
     ${counts_msg}
     <br>
     ${base_link}

@@ -5,13 +5,14 @@ set -e
 cd "$(dirname "$0")"
 
 usage() {
-    echo "Usage: $0 ANALYSIS_OUTPUT_PATH" >&2
+    echo "Usage: $0 ANALYSIS_OUTPUT_PATH PR_HEADLINE" >&2
     exit 2
 }
 
-[ $# -eq 1 ] || usage
+[ $# -eq 2 ] || usage
 
 ANALYSIS_OUTPUT_PATH=$1
+PR_HEADLINE=$2
 
 # Set variables
 #ECLAIR_REPORT_USER="github"
@@ -47,7 +48,7 @@ if [ "${IS_PR}" = 'true' ]; then
 
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \
 ${PROJECT_ARTIFACTS_PATH}/update_pr_github.sh \
-${PROJECT_ARTIFACTS_PATH} ${PR_NUMBER} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_BASE_SHA}" \
+${PROJECT_ARTIFACTS_PATH} ${PR_NUMBER} ${JOB_ID} ${GITHUB_REPOSITORY} ${PR_HEADLINE} ${PR_BASE_SHA}" \
         >>"${GITHUB_STEP_SUMMARY}"
 else
     ${ECLAIR_REPORT_HOST_SH} "ECLAIR_REPORT_HOST=${ECLAIR_REPORT_HOST} \

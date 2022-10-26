@@ -32,6 +32,13 @@ jobs:
         # PR base and head commits SHAs
         PR_BASE_SHA=${{ github.event.pull_request.base.sha }}
         PR_HEAD_SHA=${{ github.event.pull_request.head.sha }}
+        # PR info
+        PR_SENDER=${{ github.event.pull_request.sender }}
+        PR_SRC=${{ github.event.pull_request.head.ref }}
+        PR_DEST=${{ github.event.pull_request.base.ref }}
+        # Count the # of commits in the PR
+        PR_COMMIT_COUNT=$(git log --oneline ${PR_SRC} ^${PR_DEST} | wc -l)
+        PR_HEADLINE="${PR_SENDER} wants to merge ${PR_COMMIT_COUNT} into ${PR_DEST} from ${PR_SRC}"
 
         ../prepare.sh
 
@@ -42,7 +49,7 @@ jobs:
         else
             ./analyze.sh
         fi
-        PR_BASE_SHA=${PR_BASE_SHA} ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}"
+        PR_BASE_SHA=${PR_BASE_SHA} ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}" "${PR_HEADLINE}"
     - name: Upload SARIF
       if: ${{ github.event_name != 'pull_request' }}
       run: |
