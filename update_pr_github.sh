@@ -133,4 +133,4 @@ gh api \
     --method POST \
     -H "Accept: application/vnd.github.raw+json" \
     "/repos/${repo}/issues/${pr_number}/comments" \
-    -F "${pr_current_dir}/summary.txt"
+    -F '@'"${pr_current_dir}/summary.txt"
