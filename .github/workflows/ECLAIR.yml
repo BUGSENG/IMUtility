@@ -30,8 +30,8 @@ jobs:
         gh_ref=$(echo $GITHUB_REF | sed 's,/,_,')
 
         # PR base and head commits SHAs
-        PR_BASE_SHA=${{ github.event.pull_request.base.sha }}
-        PR_HEAD_SHA=${{ github.event.pull_request.head.sha }}
+        PR_BASE_COMMIT_ID=${{ github.event.pull_request.base.sha }}
+        PR_HEAD_COMMIT_ID=${{ github.event.pull_request.head.sha }}
         # PR info
         PR_SENDER=${{ github.event.pull_request.user.login }}
         PR_SRC=${{ github.event.pull_request.head.ref }}
@@ -42,12 +42,12 @@ jobs:
 
         ANALYSIS_OUTPUT_PATH="ECLAIR/out"
         if [ "${IS_PR}" = 'true' ]; then
-            ../${PR_HEAD_SHA}/ECLAIR/analyze.sh
+            ../${PR_HEAD_COMMIT_ID}/ECLAIR/analyze.sh
             ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
         else
             ./analyze.sh
         fi
-        PR_BASE_SHA=${PR_BASE_SHA} ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}" "${PR_HEADLINE}"
+        ../tag_db.sh "${ANALYSIS_OUTPUT_PATH}" "${PR_BASE_COMMIT_ID}" "${PR_HEADLINE}" 
     - name: Upload SARIF
       if: ${{ github.event_name != 'pull_request' }}
       run: |

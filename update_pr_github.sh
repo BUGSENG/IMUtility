@@ -1,44 +1,46 @@
-#!/bin/bash
+#!/bin/sh
 
 set -e
+set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report="${ECLAIR_PATH}eclair_report"
 
 usage() {
-    echo "Usage: $0 RESULTS_ROOT PR_NUMBER JOB_ID JOB_HEADLINE PR_HEADLINE PR_BASE_SHA" >&2
+    echo "Usage: $0 CI RESULTS_ROOT JOB_ID JOB_HEADLINE PR_ID PR_BASE_COMMIT PR_HEADLINE" >&2
     exit 2
 }
 
-[[ "$#" -eq 6 ]] || usage
+[ $# -eq 7 ] || usage
 
-results_root="$1"
-pr_number="$2"
-current_job_id="$3"
-job_headline="$4"
-pr_headline="$5"
-pr_base_sha="$6"
+ci="$1"
+results_root="$2"
+pr_id="$3"
+current_job_id="$4"
+job_headline="$5"
+pr_headline="$6"
+pr_base_commit="$7"
 
-commits_dir="${results_root}/commits"
+commits_dir=${results_root}/commits
 
 # PR HEAD variables
-pr_dir="${results_root}/pr"
-pr_current_dir="${pr_dir}/${current_job_id}"
-pr_db="${pr_current_dir}/PROJECT.ecd"
-pr_index="${pr_current_dir}/index.html"
+pr_dir=${results_root}/pr
+pr_current_dir=${pr_dir}/${current_job_id}
+pr_db=${pr_current_dir}/PROJECT.ecd
+pr_index=${pr_current_dir}/index.html
 
 mkdir -p "${commits_dir}"
 mkdir -p "${pr_current_dir}"
 
 # PR base variables
-base_dir="${commits_dir}/${pr_base_sha}"
+base_dir=${commits_dir}/${pr_base_commit}
 base_job_id=
-[[ ! -d "${base_dir}" ]] || base_job_id=$(basename "$(realpath "${base_dir}")")
+[ ! -d "${base_dir}" ] || base_job_id=$(basename "$(realpath "${base_dir}")")
 # For PRs, the base db is copied in the current PR's subdir, to avoid altering it
-pr_base_db_name="PROJECT_base.ecd"
+pr_base_db_name='PROJECT_base.ecd'
 cp "${base_dir}/PROJECT.ecd" "${pr_current_dir}/${pr_base_db_name}"
-pr_base_db="${pr_current_dir}/${pr_base_db_name}"
+pr_base_db=${pr_current_dir}/${pr_base_db_name}
 
 # The group where eclair_report runs must be in this file's group
 chmod g+w "${pr_db}" "${pr_base_db}"
@@ -47,10 +49,10 @@ chmod g+w "${pr_db}" "${pr_base_db}"
 generate_index_pr() {
 
     # HTML elements
-    local counts_msg
-    local base_link
+    counts_msg=
+    base_link=
 
-    if [[ -d ${base_dir} ]]; then
+    if [ -d "${base_dir}" ]; then
         counts_msg="<p>Fixed reports: ${fixed_reports} (<a href=\"${pr_base_db_name}\">Base database</a>)</p>
                     <p>New reports: ${new_reports} (<a href=\"PROJECT.ecd\">Merged database</a>)</p>"
         base_link="<p><a href=\"base/index.html\">Base job</a></p>"
@@ -91,7 +93,7 @@ generate_index_pr() {
 EOF
 }
 
-if [[ -n "${base_job_id}" ]]; then
+if [ -n "${base_job_id}" ]; then
 
     # Tag previous and current databases
     ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
@@ -119,22 +121,24 @@ else
     generate_index "${pr_current_dir}" >"${pr_index}"
 fi
 
-# Generate summary and print it (Github-specific)
-# ANALYSIS_HOST is passed from tag_db.sh
-{
-    echo '[![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair)'
-    echo "# ECLAIR analysis summary:"
-    printf "Fixed reports: %d\n" "${fixed_reports}"
-    printf "New reports: %d\n" "${new_reports}"
-    echo "[Browse analysis](${ANALYSIS_HOST}${pr_index})"
-} >"${pr_current_dir}/summary.txt"
-cat "${pr_current_dir}/summary.txt"
+if [ "${ci}" = 'github' ]; then
+    # Generate summary and print it (Github-specific)
+    # ANALYSIS_HOST is passed from tag_db.sh
+    {
+        echo '[![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair)'
+        echo "# ECLAIR analysis summary:"
+        printf "Fixed reports: %d\n" "${fixed_reports}"
+        printf "New reports: %d\n" "${new_reports}"
+        echo "[Browse analysis](${ANALYSIS_HOST}${pr_index})"
+    } >"${pr_current_dir}/summary.txt"
+    cat "${pr_current_dir}/summary.txt"
 
-# Create a comment on the PR
-repo="${job_headline}"
-gh api \
-    --method POST \
-    -H "Accept: application/vnd.github.raw+json" \
-    "/repos/${repo}/issues/${pr_number}/comments" \
-    -F body='@'"${pr_current_dir}/summary.txt" \
-    --silent
+    # Create a comment on the PR
+    repo=${job_headline}
+    gh api \
+        --method POST \
+        -H "Accept: application/vnd.github.raw+json" \
+        "/repos/${repo}/issues/${pr_id}/comments" \
+        -F body='@'"${pr_current_dir}/summary.txt" \
+        --silent
+fi
