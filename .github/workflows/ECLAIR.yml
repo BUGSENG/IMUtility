@@ -33,7 +33,7 @@ jobs:
         PR_BASE_SHA=${{ github.event.pull_request.base.sha }}
         PR_HEAD_SHA=${{ github.event.pull_request.head.sha }}
         # PR info
-        PR_SENDER=${{ github.event.pull_request.sender }}
+        PR_SENDER=${{ github.event.pull_request.sender.login }}
         PR_SRC=${{ github.event.pull_request.head.ref }}
         PR_DEST=${{ github.event.pull_request.base.ref }}
         # Count the # of commits in the PR
