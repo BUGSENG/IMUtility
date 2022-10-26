@@ -37,8 +37,8 @@ fi
 scp "${analysis_output_path}/PROJECT.ecd" "${ecd_destination}"
 
 # Send the scripts to eclair report host
-scp "${UPDATE_SCRIPTS_PATH}/update_push.sh" \
-    "${UPDATE_SCRIPTS_PATH}/update_pull_request.sh" \
+scp "${UPDATE_SCRIPTS_PATH}update_push.sh" \
+    "${UPDATE_SCRIPTS_PATH}update_pull_request.sh" \
     "${ECLAIR_REPORT_HOST_SCP}${project_actifacts_path}"
 # Execute it on that host
 {

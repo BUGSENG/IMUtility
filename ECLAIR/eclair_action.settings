@@ -8,7 +8,7 @@ ECLAIR_REPORT_HOST_SCP=
 ECLAIR_REPORT_HOST_SH='sh -c'
 
 ARTIFACTS_ROOT=/home/github/public
-UPDATE_SCRIPTS_PATH=ECLAIR
+UPDATE_SCRIPTS_PATH=
 REPOSITORY=${GITHUB_REPOSITORY}
 
 # Extract the branch name from "refs/heads/<branch>"
