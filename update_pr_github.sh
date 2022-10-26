@@ -120,6 +120,7 @@ fi
 
 # Generate summary and print it (Github-specific)
 {
+    echo '[![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair)'
     echo "# ECLAIR analysis summary:"
     printf "Fixed reports: %d\n" "${fixed_reports}"
     printf "New reports: %d\n" "${new_reports}"
@@ -133,4 +134,5 @@ gh api \
     --method POST \
     -H "Accept: application/vnd.github.raw+json" \
     "/repos/${repo}/issues/${pr_number}/comments" \
-    -F body='@'"${pr_current_dir}/summary.txt"
+    -F body='@'"${pr_current_dir}/summary.txt" \
+    --silent
