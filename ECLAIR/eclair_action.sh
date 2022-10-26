@@ -44,12 +44,12 @@ scp "${UPDATE_SCRIPTS_PATH}update_push.sh" \
 {
     if [ "${IS_PR}" = 'true' ]; then
         ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
-${project_actifacts_path}/update_pr_github.sh \
+${project_actifacts_path}/update_pull_request.sh \
 '${CI}' '${project_actifacts_path}' '${JOB_ID}' '${REPOSITORY}' \
 '${PR_ID}' '${pr_base_commit_id}' '${pr_headline}' "
     else
         ${ECLAIR_REPORT_HOST_SH} "ANALYSIS_HOST=${ECLAIR_REPORT_HOST_PREFIX} \
-${project_actifacts_path}/update.sh \
+${project_actifacts_path}/update_push.sh \
 '${CI}' '${project_actifacts_path}' '${BRANCH}' '${BADGE_LABEL}' \
 '${JOB_ID}' '${REPOSITORY}' '${commit_id}'"
     fi
