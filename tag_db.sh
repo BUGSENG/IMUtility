@@ -9,7 +9,7 @@ usage() {
     exit 2
 }
 
-[ $# -eq 2 ] || usage
+[ $# -eq 3 ] || usage
 
 ANALYSIS_OUTPUT_PATH="$1"
 PR_BASE_COMMIT_ID="$2"

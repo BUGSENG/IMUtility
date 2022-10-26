@@ -40,10 +40,10 @@ jobs:
 
         ../prepare.sh
 
-        ANALYSIS_OUTPUT_PATH="ECLAIR/out"
+        ANALYSIS_OUTPUT_PATH='ECLAIR/out'
         if [ "${IS_PR}" = 'true' ]; then
             ../${PR_HEAD_COMMIT_ID}/ECLAIR/analyze.sh
-            ANALYSIS_OUTPUT_PATH="${PR_HEAD_SHA}/ECLAIR/out"
+            ANALYSIS_OUTPUT_PATH=${PR_HEAD_SHA}/ECLAIR/out
         else
             ./analyze.sh
         fi
