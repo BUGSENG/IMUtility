@@ -29,9 +29,6 @@ current_index=${current_dir}/index.html
 previous_index=${current_dir}/prev/index.html
 commits_dir=${results_root}/commits
 
-new_reports=
-fixed_reports=
-
 mkdir -p "${commits_dir}"
 
 # The group where eclair_report runs must be in this file's group
@@ -49,7 +46,7 @@ generate_index() {
     prev_dir=${job_dir}/prev
     next_dir=${job_dir}/next
 
-    new_reports=$(cat "${job_dir}/new_reports.txt")
+    local_new_reports=$(cat "${job_dir}/new_reports.txt")
 
     counts_msg=
     prev_link=
@@ -57,11 +54,11 @@ generate_index() {
     latest_db_msg=
 
     if [ -d "${prev_dir}" ]; then
-        fixed_reports=$(cat "${job_dir}/fixed_reports.txt")
+        local_fixed_reports=$(cat "${job_dir}/fixed_reports.txt")
         counts_msg=$(
             cat <<EOF
-<p>Fixed reports: ${fixed_reports} (<a href="prev/PROJECT.ecd">previous database</a>)</p>
-<p>New reports: ${new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
+<p>Fixed reports: ${local_fixed_reports} (<a href="prev/PROJECT.ecd">previous database</a>)</p>
+<p>New reports: ${local_new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
 EOF
         )
         prev_link=$(
@@ -72,7 +69,7 @@ EOF
     else
         counts_msg=$(
             cat <<EOF
-<p>Reports: ${new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
+<p>Reports: ${local_new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
 EOF
         )
     fi
@@ -179,7 +176,7 @@ ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
 
 if [ "${ci}" = 'github' ]; then
     # Generate summary and print it (Github-specific)
-    # ANALYSIS_HOST is passed from tag_db.sh
+    # ANALYSIS_HOST is passed from eclair_action.sh
     {
         echo "# ECLAIR analysis summary:"
         printf "Fixed reports: %d\n" "${fixed_reports:-unavailable}"
