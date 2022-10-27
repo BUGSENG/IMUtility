@@ -97,6 +97,8 @@ EOF
 EOF
 }
 
+unfixed_reports=$(${eclair_report} -db="'${base_db}'" -sel_unfixed=unfixed '-print="",reports_count()')
+
 if [ -n "${base_job_id}" ]; then
 
     # Tag previous and current databases
@@ -104,8 +106,8 @@ if [ -n "${base_job_id}" ]; then
         -tag_diff="'${base_db}','${current_db}'"
 
     # Count reports
-    fixed_reports=$(${eclair_report} -db="${base_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
-    new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
+    fixed_reports=$(${eclair_report} -db="'${base_db}'" -sel_unfixed=unfixed -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    new_reports=$(${eclair_report} -db="'${current_db}'" -sel_unfixed=unfixed -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
 
     # Generate badge for the current run
     #anybadge -o --label="ECLAIR" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
@@ -118,8 +120,7 @@ if [ -n "${base_job_id}" ]; then
 else
     # No base commit analysis found
     # TODO: what to do?
-    #new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    #anybadge -o --label="ECLAIR ${current_job_id}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
+    #anybadge -o --label="ECLAIR ${current_job_id}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
     # Generate index for the current job
     generate_index_html >"${current_index_html}"
@@ -131,7 +132,7 @@ if [ "${ci}" = 'github' ]; then
         echo "[![ECLAIR](${url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)"
         echo "# ECLAIR analysis summary:"
         echo "Fixed reports: ${fixed_reports}"
-        echo "New reports: ${new_reports}"
+        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
         echo "[Browse analysis](${current_index_html_url})"
     } >"${current_dir}/summary.txt"
     cat "${current_dir}/summary.txt"
