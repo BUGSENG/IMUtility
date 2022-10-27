@@ -22,6 +22,7 @@ if [ -n "${GITLAB_CI}" ]; then
     *)
         echo "Unexpected event ${CI_PIPELINE_SOURCE}" >&2
         exit 1
+        ;;
     esac
 elif [ -n "${GITHUB_ACTION}" ]; then
     # Fit to repo setup, and add to the ECLAIR folder
@@ -33,10 +34,10 @@ elif [ -n "${GITHUB_ACTION}" ]; then
     job_id=${GITHUB_RUN_NUMBER:?}
 
     case "${GITHUB_REF:?}" in
-    refs/pulls/*/merge)
+    refs/pull/*/merge)
         event="pull_request"
         # Extract PR number from "refs/pull/<prnum>/merge"
-        pr_id=${GITHUB_REF#refs/pulls/}
+        pr_id=${GITHUB_REF#refs/pull/}
         pr_id=${pr_id%/merge}
         pull_request_head_ref=${PR_HEAD_REF:?}
         pull_request_base_ref=${PR_BASE_REF:?}
@@ -50,12 +51,12 @@ elif [ -n "${GITHUB_ACTION}" ]; then
     *)
         echo "Unexpected GITHUB_REF ${GITHUB_REF}" >&2
         exit 1
+        ;;
     esac
 else
     echo "Unexpected CI/CD context" >&2
     exit 1
 fi
-
 
 # Common settings
 eclair_report_url_prefix=https://eclairit.com:3787
@@ -76,6 +77,5 @@ push)
 *)
     echo "Unexpected Event ${event}" >&2
     exit 1
+    ;;
 esac
-
-
