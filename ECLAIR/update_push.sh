@@ -48,6 +48,7 @@ generate_index_html() {
     prev_dir=${job_dir}/prev
     next_dir=${job_dir}/next
 
+    local_unfixed_reports=$(cat "${job_dir}/unfixed_reports.txt")
     local_new_reports=$(cat "${job_dir}/new_reports.txt")
 
     counts_msg=
@@ -60,7 +61,7 @@ generate_index_html() {
         counts_msg=$(
             cat <<EOF
 <p>Fixed reports: ${local_fixed_reports} (<a href="prev/PROJECT.ecd">previous database</a>)</p>
-<p>New reports: ${local_new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
+<p>Unfixed reports: ${local_unfixed_reports} [new: ${local_new_reports}] (<a href="PROJECT.ecd">current database</a>)</p>
 EOF
         )
         prev_link=$(
@@ -71,7 +72,7 @@ EOF
     else
         counts_msg=$(
             cat <<EOF
-<p>Reports: ${local_new_reports} (<a href="PROJECT.ecd">current database</a>)</p>
+<p>Unfixed reports: ${local_unfixed_reports} (<a href="PROJECT.ecd">current database</a>)</p>
 EOF
         )
     fi
@@ -131,6 +132,9 @@ EOF
 EOF
 }
 
+unfixed_reports=$(${eclair_report} -db="'${current_db}'" -sel_unfixed=unfixed '-print="",reports_count()')
+echo "${unfixed_reports}" >"${artifacts_branch_dir}/${current_job_id}/unfixed_reports.txt"
+
 if [ -n "${latest_job_id}" ]; then
     latest_db=${latest_dir}/PROJECT.ecd
 
@@ -139,13 +143,13 @@ if [ -n "${latest_job_id}" ]; then
         -tag_diff="'${latest_db}','${current_db}'"
 
     # Count reports
-    fixed_reports=$(${eclair_report} -db="${latest_db}" -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
-    echo "${fixed_reports}" >"${current_dir}/fixed_reports.txt"
-    new_reports=$(${eclair_report} -db="${current_db}" -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
-    echo "${new_reports}" >"${current_dir}/new_reports.txt"
+    fixed_reports=$(${eclair_report} -db="'${latest_db}'" -sel_unfixed=unfixed -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
+    echo "${fixed_reports}" >"${artifacts_branch_dir}/${current_job_id}/fixed_reports.txt"
+    new_reports=$(${eclair_report} -db="'${current_db}'" -sel_unfixed=unfixed -sel_tag_glob=diff_prev,prev,missing '-print="",reports_count()')
+    echo "${new_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
 
     # Generate badge for the current run
-    anybadge -o --label="${badge_label}" --value="fixed ${fixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="${badge_label}" --value="fixed ${fixed_reports} | unfixed ${unfixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
 
     # Add link to previous run of current run
     ln -s "../${latest_job_id}" "${current_dir}/prev"
@@ -161,10 +165,9 @@ if [ -n "${latest_job_id}" ]; then
     generate_index_html "${previous_job_id}" >"${previous_index}"
 
 else
-    new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    echo "${new_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
 
-    anybadge -o --label="${badge_label}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
+    echo "${unfixed_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
+    anybadge -o --label="${badge_label}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
     # Generate index for the current job
     generate_index_html "${current_job_id}" >"${current_index_html}"
@@ -182,7 +185,7 @@ if [ "${ci}" = 'github' ]; then
         echo "# ECLAIR analysis summary:"
         if [ -n "${latest_job_id}" ]; then
             echo "Fixed reports: ${fixed_reports}"
-            echo "New reports: ${new_reports}"
+            echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
         else
             echo "Reports: ${new_reports}"
         fi
