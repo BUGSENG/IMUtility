@@ -21,7 +21,7 @@ jobs:
         cd ECLAIR
         ../prepare.sh
         ./analyze.sh
-        ./action_pull_request.sh out "${GITHUB_SHA} "${PR_BASE_COMMIT_ID}"
+        ./action_pull_request.sh out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh
