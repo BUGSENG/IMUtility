@@ -4,6 +4,6 @@ void f()
     signed char sc;
     char c;
     int i;
-    // char aaa;
+    i = (c) ?: sc;
     i = (c) ?: sc;
 }
