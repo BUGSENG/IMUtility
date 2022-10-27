@@ -17,7 +17,7 @@ usage() {
 analysis_output_dir=$1
 commit_id=$2
 
-current_job_dir=${eclair_report_host_scp}${artifacts_dir}/${branch}/${job_id}/
+current_job_dir=${eclair_report_host_scp}${artifacts_dir}/${branch}/${job_id}
 
 # create a directory for the analysis artifacts
 ${eclair_report_host_sh} "mkdir -p '${current_job_dir}'"

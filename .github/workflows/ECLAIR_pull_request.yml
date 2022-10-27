@@ -1,67 +1,32 @@
 name: "ECLAIR pull request"
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - 'main'
   pull_request:
-    types: ['opened', 'synchronize', 'edited', 'reopened']
+    types: ['opened', 'synchronize']
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  IS_PR: ${{ github.event_name == 'pull_request' }}
 jobs:
   Analyze:
     runs-on: self-hosted
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
-      with:
-        ref: main
-    - name: Checkout PR HEAD
-      uses: actions/checkout@v3
-      if: ${{ env.IS_PR == 'true' }}
-      with:
-        ref: ${{ github.event.pull_request.head.sha }}
-        path: ${{ github.event.pull_request.head.sha }}
     - name: Analyze
       env:
+        PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        PR_BASE_REF: ${{ github.event.pull_request.base.ref }}
         PR_BASE_COMMIT_ID: ${{ github.event.pull_request.base.sha }}
-        PR_HEAD_COMMIT_ID: ${{ github.event.pull_request.head.sha }}
-        PR_SENDER: ${{ github.event.pull_request.user.login }}
-        PR_SRC: ${{ github.event.pull_request.head.ref }}
-        PR_DEST: ${{ github.event.pull_request.base.ref }}
+        PR_USER: ${{ github.event.pull_request.user.login }}
       run: |
         set -e
         cd ECLAIR
-
         ../prepare.sh
-
-        # Assumes that ./action_*.sh runs inside the folder ECLAIR
-        # Therefore the project db is inside ECLAIR/out
-        ANALYSIS_OUTPUT_PATH=out
-        if [ "${IS_PR}" = 'true' ]; then
-            ../${PR_HEAD_COMMIT_ID}/ECLAIR/analyze.sh
-            ANALYSIS_OUTPUT_PATH=../${PR_HEAD_COMMIT_ID}/ECLAIR/${ANALYSIS_OUTPUT_PATH}
-            ./action_pull_request.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA} "${PR_BASE_COMMIT_ID}"
-        else
-            ./analyze.sh
-            ./action_push.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA}"
-        fi
-
-        
+        ./analyze.sh
+        ./action_pull_request.sh out "${GITHUB_SHA} "${PR_BASE_COMMIT_ID}"
     - name: Upload SARIF
-      if: ${{ github.event_name != 'pull_request' }}
       run: |
         ./ECLAIR/upload.sh
     - name: Upload Artifact
-      if: ${{ env.IS_PR != 'true' }}
       uses: actions/upload-artifact@v3
       with:
         name: artifacts
         path: ECLAIR/out
-    - name: Upload PR Artifact
-      if: ${{ env.IS_PR == 'true' }}
-      uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: ${{ github.event.pull_request.head.sha }}/ECLAIR/out

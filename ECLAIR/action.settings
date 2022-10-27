@@ -10,10 +10,10 @@ if [ -n "${GITLAB_CI}" ]; then
     case "${CI_PIPELINE_SOURCE:?}" in
     merge_request_event)
         event="pull_request"
-        pull_request_source_branch=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:?}
-        pull_request_dest_branch=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:?}
-        pull_request_sender=${GITLAB_USER_LOGIN:?}
         pr_id=${CI_MERGE_REQUEST_IID:?}
+        pull_request_head_ref=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:?}
+        pull_request_base_ref=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:?}
+        pull_request_user=${GITLAB_USER_LOGIN:?}
         ;;
     push)
         event="push"
@@ -22,11 +22,8 @@ if [ -n "${GITLAB_CI}" ]; then
     *)
         echo "Unexpected event ${CI_PIPELINE_SOURCE}" >&2
         exit 1
-        ;;
     esac
-fi
-
-if [ -n "${GITHUB_ACTION}" ]; then
+elif [ -n "${GITHUB_ACTION}" ]; then
     # Fit to repo setup, and add to the ECLAIR folder
     ci=github
 
@@ -41,9 +38,9 @@ if [ -n "${GITHUB_ACTION}" ]; then
         # Extract PR number from "refs/pull/<prnum>/merge"
         pr_id=${GITHUB_REF#refs/pulls/}
         pr_id=${pr_id%/merge}
-        pull_request_source_branch=${PR_SRC:?}
-        pull_request_dest_branch=${PR_DEST:?}
-        pull_request_sender=${PR_SENDER:?}
+        pull_request_head_ref=${PR_HEAD_REF:?}
+        pull_request_base_ref=${PR_BASE_REF:?}
+        pull_request_user=${PR_USER:?}
         ;;
     refs/heads/*)
         event="push"
@@ -53,14 +50,15 @@ if [ -n "${GITHUB_ACTION}" ]; then
     *)
         echo "Unexpected GITHUB_REF ${GITHUB_REF}" >&2
         exit 1
-        ;;
     esac
-
+else
+    echo "Unexpected CI/CD context" >&2
+    exit 1
 fi
 
+
 # Common settings
-eclair_report_host=eclairit.com:3787
-eclair_report_url_prefix=https://${eclair_report_host}
+eclair_report_url_prefix=https://eclairit.com:3787
 eclair_report_host_scp=
 eclair_report_host_sh="sh -c"
 
@@ -70,7 +68,7 @@ badge_label="ECLAIR ${branch} #${job_id}"
 
 case "${event}" in
 pull_request)
-    job_headline="${pull_request_sender} wants to merge ${pull_request_source_branch} into ${pull_request_dest_branch}"
+    job_headline="${pull_request_user} wants to merge ${pull_request_head_ref} into ${pull_request_base_ref}"
     ;;
 push)
     job_headline="${repository} (${branch})"
@@ -78,5 +76,6 @@ push)
 *)
     echo "Unexpected Event ${event}" >&2
     exit 1
-    ;;
 esac
+
+
