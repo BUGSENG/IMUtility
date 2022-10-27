@@ -60,7 +60,7 @@ EOF
         )
         base_link=$(
             cat <<EOF
-<p><a href="base/index.html">Base job</a></p>
+<p><a href="base/index.html">Base analysis</a></p>
 EOF
         )
     fi
@@ -71,14 +71,14 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline}: ECLAIR job #${current_job_id}</title>
+  <title>${job_headline}: ECLAIR analysis #${current_job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline}: ECLAIR job #${current_job_id}</span>
+   <span>${job_headline}: ECLAIR analysis #${current_job_id}</span>
   </div>
   ${counts_msg}
   <br>
@@ -122,7 +122,7 @@ else
     # TODO: what to do?
     #anybadge -o --label="ECLAIR ${current_job_id}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
-    # Generate index for the current job
+    # Generate index for the current analysis
     generate_index_html >"${current_index_html}"
 fi
 
