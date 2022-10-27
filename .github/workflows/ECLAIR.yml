@@ -43,11 +43,13 @@ jobs:
         if [ "${IS_PR}" = 'true' ]; then
             ../${PR_HEAD_COMMIT_ID}/ECLAIR/analyze.sh
             ANALYSIS_OUTPUT_PATH=../${PR_HEAD_COMMIT_ID}/ECLAIR/${ANALYSIS_OUTPUT_PATH}
+            ./action_pull_request.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA} "${PR_BASE_COMMIT_ID}"
         else
             ./analyze.sh
+            ./action_push.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA}"
         fi
 
-        ./action.sh "${ANALYSIS_OUTPUT_PATH}" "${GITHUB_SHA}"
+        
     - name: Upload SARIF
       if: ${{ github.event_name != 'pull_request' }}
       run: |

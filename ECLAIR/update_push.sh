@@ -5,44 +5,46 @@ set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
-eclair_report="${ECLAIR_PATH}eclair_report"
+eclair_report=${ECLAIR_PATH}eclair_report
 
 usage() {
-    echo "Usage: $0 CI RESULTS_ROOT JOB_ID JOB_HEADLINE COMMIT_ID BRANCH BADGE_LABEL " >&2
+    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID BRANCH BADGE_LABEL " >&2
     exit 2
 }
 
-[ $# -eq 7 ] || usage
+[ $# -eq 8 ] || usage
 
-ci="$1"
-results_root="$2"
-current_job_id="$3"
-job_headline="$4"
-commit_id="$5"
-branch="$6"
-badge_label="$7"
+ci=$1
+url_prefix=$2
+artifacts_dir=$3
+current_job_id=$4
+job_headline=$5
+commit_id=$6
+branch=$7
+badge_label=$8
 
-results_branch_dir=${results_root}/${branch}
-current_dir=${results_branch_dir}/${current_job_id}
+commits_dir=${artifacts_dir}/commits
+artifacts_branch_dir=${artifacts_dir}/${branch}
+current_dir=${artifacts_branch_dir}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
-current_index=${current_dir}/index.html
+current_index_html=${current_dir}/index.html
+current_index_html_url=${url_prefix}/fs${current_index_html}
 previous_index=${current_dir}/prev/index.html
-commits_dir=${results_root}/commits
 
 mkdir -p "${commits_dir}"
 
 # The group running eclair_report must be in this file's group
 chmod g+w "${current_db}"
 
-latest_dir=${results_branch_dir}/latest
+latest_dir=${artifacts_branch_dir}/latest
 latest_job_id=
 [ ! -d "${latest_dir}" ] || latest_job_id=$(basename "$(realpath "${latest_dir}")")
 
 # Generate a file index.html to browse the analysis
-generate_index() {
+generate_index_html() {
 
     job_id=$1
-    job_dir=${results_branch_dir}/${job_id}
+    job_dir=${artifacts_branch_dir}/${job_id}
     prev_dir=${job_dir}/prev
     next_dir=${job_dir}/next
 
@@ -152,36 +154,39 @@ if [ -n "${latest_job_id}" ]; then
     ln -s "../${current_job_id}" "${latest_dir}/next"
 
     # Generate index for the current job
-    generate_index "${current_job_id}" >"${current_index}"
+    generate_index_html "${current_job_id}" >"${current_index_html}"
 
     # Re-generate index for the previous job
     previous_job_id=$(grep -o "#[0-9]*" "${previous_index}" | head -1 | cut -c2-)
-    generate_index "${previous_job_id}" >"${previous_index}"
+    generate_index_html "${previous_job_id}" >"${previous_index}"
 
 else
     new_reports=$(${eclair_report} -db="${current_db}" '-print="",reports_count()')
-    echo "${new_reports}" >"${results_branch_dir}/${current_job_id}/new_reports.txt"
+    echo "${new_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
 
     anybadge -o --label="${badge_label}" --value="reports: ${new_reports}" --file="${current_dir}/badge.svg"
 
     # Generate index for the current job
-    generate_index "${current_job_id}" >"${current_index}"
+    generate_index_html "${current_job_id}" >"${current_index_html}"
 fi
 
 # Update latest symlink
 ln -sfn "${current_job_id}" "${latest_dir}"
 
 # Add a link relating commit id to latest build done for it
-ln -sfn "../${current_job_id}" "${commits_dir}/${commit_id}"
+ln -sfn "../${branch}/${current_job_id}" "${commits_dir}/${commit_id}"
 
 if [ "${ci}" = 'github' ]; then
     # Generate summary and print it (Github-specific)
-    # ANALYSIS_HOST is passed from action.sh
     {
         echo "# ECLAIR analysis summary:"
-        printf "Fixed reports: %d\n" "${fixed_reports:-unavailable}"
-        printf "New reports: %d\n" "${new_reports:-unavailable}"
-        echo "[Browse analysis](${ANALYSIS_HOST}${current_index})"
+        if [ -n "${latest_job_id}" ]; then
+            echo "Fixed reports: ${fixed_reports}"
+            echo "New reports: ${new_reports}"
+        else
+            echo "Reports: ${new_reports}"
+        fi
+        echo "[Browse analysis](${current_index_html_url})"
     } >>"${current_dir}/summary.txt"
     cat "${current_dir}/summary.txt"
 fi
