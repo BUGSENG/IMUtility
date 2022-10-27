@@ -196,7 +196,7 @@ gitlab)
     # Generate summary and print it (GitLab-specific)
     esc=$(printf '\e')
     cr=$(printf '\r')
-    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    echo "${esc}[0Ksection_start:`date +%s`:ECLAIR_summary${cr}${esc}[0K${esc}[1mECLAIR analysis summary${esc}[m"
     if [ -n "${latest_job_id}" ]; then
         echo "Fixed reports: ${fixed_reports}"
         echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
@@ -204,6 +204,7 @@ gitlab)
         echo "Unfixed reports: ${unfixed_reports}"
     fi
     echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    echo "${esc}[0Ksection_end:`date +%s`:ECLAIR_summary${cr}${esc}[0K"
     ;;
 *) ;;
 esac >"${current_dir}/summary.txt"
