@@ -1,0 +1,27 @@
+name: "ECLAIR push"
+on:
+  workflow_dispatch:
+  push:
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  Analyze:
+    runs-on: self-hosted
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+    - name: Analyze
+      run: |
+        set -e
+        cd ECLAIR
+        ../prepare.sh
+        ./analyze.sh
+        ./action_push.sh out "${GITHUB_SHA}"
+    - name: Upload SARIF
+      run: |
+        ./ECLAIR/upload.sh
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: ECLAIR/out

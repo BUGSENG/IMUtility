@@ -1,4 +1,4 @@
-name: "ECLAIR"
+name: "ECLAIR pull request"
 on:
   workflow_dispatch:
   push:
@@ -30,14 +30,13 @@ jobs:
         PR_SENDER: ${{ github.event.pull_request.user.login }}
         PR_SRC: ${{ github.event.pull_request.head.ref }}
         PR_DEST: ${{ github.event.pull_request.base.ref }}
-        PR_HEADLINE: "${PR_SENDER} wants to merge ${PR_SRC} into ${PR_DEST}"
       run: |
         set -e
         cd ECLAIR
 
         ../prepare.sh
 
-        # Assumes that ./action.sh runs inside the folder ECLAIR
+        # Assumes that ./action_*.sh runs inside the folder ECLAIR
         # Therefore the project db is inside ECLAIR/out
         ANALYSIS_OUTPUT_PATH=out
         if [ "${IS_PR}" = 'true' ]; then
