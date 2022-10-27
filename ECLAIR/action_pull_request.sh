@@ -33,4 +33,4 @@ scp update_pull_request.sh \
 [ "${job_summary_file}" = /dev/stdout ] || exec >"${job_summary_file}"
 ${eclair_report_host_sh} "${current_job_dir}/update_pull_request.sh \
 '${ci}' '${eclair_report_url_prefix}' '${artifacts_dir}' '${job_id}' '${job_headline}' \
-'${commit_id}' '${pr_id}' '${base_commit_id}'"
+'${commit_id}' '${pr_id}' '${base_commit_id}' ${repository}"
