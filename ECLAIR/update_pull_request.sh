@@ -55,12 +55,12 @@ generate_index_html() {
         counts_msg=$(
             cat <<EOF
 <p>Fixed reports: ${fixed_reports} (<a href="${base_db_name}">Base database</a>)</p>
-<p>New reports: ${new_reports} (<a href="PROJECT.ecd">Merged database</a>)</p>
+<p>Unfixed reports: ${unfixed_reports} [new: ${new_reports}] (<a href="PROJECT.ecd">Merged database</a>)</p>
 EOF
         )
         base_link=$(
             cat <<EOF
-<p><a href="base/index.html">Base analysis</a></p>
+<a href="base/index.html">Base analysis</a>
 EOF
         )
     fi
@@ -81,8 +81,10 @@ EOF
    <span>${job_headline}: ECLAIR analysis #${current_job_id}</span>
   </div>
   ${counts_msg}
-  <br>
-  ${base_link}
+  <hr>
+  <p>
+   ${base_link} <a href="../">All PR analyses</a>
+  </p>
   <div class="footer"><div>
    <a href="http://bugseng.com" target="_blank"><img src="/rsrc/bugseng.png" alt="BUGSENG">
     <span class="tagline">software verification done right.</span>
