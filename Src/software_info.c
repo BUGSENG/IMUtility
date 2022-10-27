@@ -63,22 +63,22 @@ bool
 SwInfo_getDataJson(uint8_t* buffer, uint16_t size) {
 
     bool success = true;
-    success &= Json_startString((char*)buffer, size);
-    success &= Json_addData((char*)buffer, size, "git_branch", git_branch);
-    success &= Json_addData((char*)buffer, size, "git_hash", git_hash);
-    success &= Json_addData((char*)buffer, size, "git_tag", git_tag);
+    success = success && Json_startString((char*)buffer, size);
+    success = success && Json_addData((char*)buffer, size, "git_branch", git_branch);
+    success = success && Json_addData((char*)buffer, size, "git_hash", git_hash);
+    success = success && Json_addData((char*)buffer, size, "git_tag", git_tag);
 #ifdef LDS_RAM_VERSION
-    success &= Json_addData((char*)buffer, size, "ld_script_variant", "RAM");
+    success = success && Json_addData((char*)buffer, size, "ld_script_variant", "RAM");
 #else
-    success &= Json_addData((char*)buffer, size, "ld_script_variant", "FLASH");
+    success = success && Json_addData((char*)buffer, size, "ld_script_variant", "FLASH");
 #endif
 
 #ifdef SECURED
-    success &= Json_addData((char*)buffer, size, "build_variant", "secured");
+    success = success && Json_addData((char*)buffer, size, "build_variant", "secured");
 #else
-    success &= Json_addData((char*)buffer, size, "build_variant", "normal");
+    success = success && Json_addData((char*)buffer, size, "build_variant", "normal");
 #endif
-    success &= Json_endString((char*)buffer, size);
+    success = success && Json_endString((char*)buffer, size);
 
     return success;
 }
