@@ -1,18 +1,17 @@
 #!/bin/sh
 
 set -e
-set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report=${ECLAIR_PATH}eclair_report
 
 usage() {
-    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID PR_ID BASE_COMMIT" >&2
+    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID PR_ID BASE_COMMIT REPOSITORY" >&2
     exit 2
 }
 
-[ $# -eq 8 ] || usage
+[ $# -eq 9 ] || usage
 
 ci=$1
 url_prefix=$2
@@ -23,6 +22,7 @@ job_headline=$5
 #commit_id=$
 pr_id=$7
 base_commit=$8
+repository=$9
 
 commits_dir=${artifacts_dir}/commits
 current_dir=${artifacts_dir}/pr/${current_job_id}
@@ -139,23 +139,21 @@ gitlab)
     esc=$(printf '\e')
     cr=$(printf '\r')
     # Generate summary and print it (GitLab-specific)
-    echo "${esc}[0Ksection_start:`date +%s`:ECLAIR_summary${cr}${esc}[0K${esc}[1mECLAIR analysis summary${esc}[m"
+    echo "${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[92mECLAIR analysis summary${esc}[m"
     echo "Fixed reports: ${fixed_reports}"
     echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
     echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
-    echo "${esc}[0Ksection_end:`date +%s`:ECLAIR_summary${cr}${esc}[0K"
+    echo "${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K"
     ;;
 *) ;;
 esac >"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"
 
 if [ "${ci}" = github ]; then
-    # Create a comment on the PR
-    repo=${job_headline}
     gh api \
         --method POST \
         -H "Accept: application/vnd.github.raw+json" \
-        "/repos/${repo}/issues/${pr_id}/comments" \
+        "/repos/${repository}/issues/${pr_id}/comments" \
         -F body='@'"${current_dir}/summary.txt" \
         --silent
 fi
