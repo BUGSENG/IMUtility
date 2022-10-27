@@ -112,6 +112,7 @@ int
 Base64_decode(const char* in, size_t in_len, unsigned char* out, size_t max_out_len) {
     int success = 0;
     const unsigned char* in_data_uchar = (const unsigned char*)in;
+    /* const unsigned char* in_data_uchar = (const unsigned char*)in; */
     bool pad_bool = (in_len > 0U) && ((in_len % 4U) != 0U || (in_data_uchar[in_len - 1U] == (unsigned char)'='));
     unsigned int pad_uint = 0U;
     if (pad_bool) {
