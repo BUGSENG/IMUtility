@@ -126,17 +126,29 @@ else
     generate_index_html >"${current_index_html}"
 fi
 
-if [ "${ci}" = 'github' ]; then
-    # Generate summary and print it (Github-specific)
-    {
-        echo "[![ECLAIR](${url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)"
-        echo "# ECLAIR analysis summary:"
-        echo "Fixed reports: ${fixed_reports}"
-        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
-        echo "[Browse analysis](${current_index_html_url})"
-    } >"${current_dir}/summary.txt"
-    cat "${current_dir}/summary.txt"
+case "${ci}" in
+github)
+    # Generate summary and print it (GitHub-specific)
+    echo "[![ECLAIR](${url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)"
+    echo "# ECLAIR analysis summary:"
+    echo "Fixed reports: ${fixed_reports}"
+    echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
+    echo "[Browse analysis](${current_index_html_url})"
+    ;;
+gitlab)
+    esc=$(printf '\e')
+    cr=$(printf '\r')
+    # Generate summary and print it (GitLab-specific)
+    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    echo "Fixed reports: ${fixed_reports}"
+    echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
+    echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    ;;
+*) ;;
+esac >"${current_dir}/summary.txt"
+cat "${current_dir}/summary.txt"
 
+if [ "${ci}" = github ]; then
     # Create a comment on the PR
     repo=${job_headline}
     gh api \
