@@ -115,7 +115,7 @@ EOF
   ${latest_db_msg}
   <hr>
   <p>
-   ${prev_link}${next_link}<a href="../">Jobs</a>
+   ${prev_link} ${next_link} <a href="../">Jobs</a>
   </p>
   <div class="footer"><div>
    <a href="http://bugseng.com" target="_blank">
