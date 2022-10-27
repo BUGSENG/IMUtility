@@ -17,11 +17,11 @@ usage() {
 ci=$1
 url_prefix=$2
 artifacts_dir=$3
-pr_id=$4
-current_job_id=$5
-job_headline=$6
+current_job_id=$4
+job_headline=$5
 #Commit id of the (implicit) merge commit created by CI (for future use)
-#commit_id=$7
+#commit_id=$
+pr_id=$7
 base_commit=$8
 
 commits_dir=${artifacts_dir}/commits
@@ -139,10 +139,11 @@ gitlab)
     esc=$(printf '\e')
     cr=$(printf '\r')
     # Generate summary and print it (GitLab-specific)
-    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    echo "${esc}[0Ksection_start:`date +%s`:ECLAIR_summary${cr}${esc}[0K${esc}[1mECLAIR analysis summary${esc}[m"
     echo "Fixed reports: ${fixed_reports}"
     echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
     echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    echo "${esc}[0Ksection_end:`date +%s`:ECLAIR_summary${cr}${esc}[0K"
     ;;
 *) ;;
 esac >"${current_dir}/summary.txt"
