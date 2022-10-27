@@ -139,7 +139,7 @@ if [ -n "${latest_job_id}" ]; then
 
     # Tag previous and current databases
     ${eclair_report} -setq=diff_tag_domain1,next -setq=diff_tag_domain2,prev \
-        -diff_criteria=fingerprint -tag_diff="'${latest_db}','${current_db}'"
+        -tag_diff="'${latest_db}','${current_db}'"
 
     # Count reports
     fixed_reports=$(${eclair_report} -db="'${latest_db}'" -sel_unfixed=unfixed -sel_tag_glob=diff_next,next,missing '-print="",reports_count()')
