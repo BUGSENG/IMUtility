@@ -179,17 +179,32 @@ ln -sfn "${current_job_id}" "${latest_dir}"
 # Add a link relating commit id to latest build done for it
 ln -sfn "../${branch}/${current_job_id}" "${commits_dir}/${commit_id}"
 
-if [ "${ci}" = 'github' ]; then
-    # Generate summary and print it (Github-specific)
-    {
-        echo "# ECLAIR analysis summary:"
-        if [ -n "${latest_job_id}" ]; then
-            echo "Fixed reports: ${fixed_reports}"
-            echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
-        else
-            echo "Reports: ${new_reports}"
-        fi
-        echo "[Browse analysis](${current_index_html_url})"
-    } >>"${current_dir}/summary.txt"
-    cat "${current_dir}/summary.txt"
-fi
+case "${ci}" in
+github)
+    # Generate summary and print it (GitHub-specific)
+    echo "[![ECLAIR](${url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)"
+    echo "# ECLAIR analysis summary:"
+    if [ -n "${latest_job_id}" ]; then
+        echo "Fixed reports: ${fixed_reports}"
+        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
+    else
+        echo "Unfixed reports: ${unfixed_reports}"
+    fi
+    echo "[Browse analysis](${current_index_html_url})"
+    ;;
+gitlab)
+    # Generate summary and print it (GitLab-specific)
+    esc=$(printf '\e')
+    cr=$(printf '\r')
+    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    if [ -n "${latest_job_id}" ]; then
+        echo "Fixed reports: ${fixed_reports}"
+        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
+    else
+        echo "Unfixed reports: ${unfixed_reports}"
+    fi
+    echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    ;;
+*) ;;
+esac >"${current_dir}/summary.txt"
+cat "${current_dir}/summary.txt"

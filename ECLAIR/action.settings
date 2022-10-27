@@ -4,7 +4,7 @@ if [ -n "${GITLAB_CI}" ]; then
 
     artifacts_root=/home/eclair-gitlab/gitlab
     repository=${CI_PROJECT_PATH:?}
-    job_summary_file=/dev/null
+    job_summary_file=/dev/stdout
     job_id=${CI_JOB_ID:?}
 
     case "${CI_PIPELINE_SOURCE:?}" in

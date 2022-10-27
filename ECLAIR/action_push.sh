@@ -33,4 +33,4 @@ scp update_push.sh \
 ${eclair_report_host_sh} "${current_job_dir}/update_push.sh \
 '${ci}' '${eclair_report_url_prefix}' '${artifacts_dir}' '${job_id}' '${job_headline}' \
 '${commit_id}' '${branch}' '${badge_label}'" \
-    >>"${job_summary_file}"
+    >"${job_summary_file}"
