@@ -63,7 +63,7 @@ gitlab)
     esc=$(printf '\e')
     cr=$(printf '\r')
     cat <<EOF
-${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[92mECLAIR analysis summary${esc}[m
+${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[36mECLAIR analysis summary${esc}[m
 Fixed reports: ${fixed_reports}
 Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
 Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m
