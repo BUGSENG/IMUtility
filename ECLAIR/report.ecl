@@ -16,18 +16,18 @@ map_strings("load_ecb", dir_entries(data_dir))
 setq(output_dir,"out")
 
 # Full output in pure text format.
-full_txt(join_paths(output_dir,"txt"))
+#full_txt(join_paths(output_dir,"txt"))
 # Output metrics for use with spreadsheet applications (if enabled).
-metrics_tab(join_paths(output_dir,"metrics"))
+#metrics_tab(join_paths(output_dir,"metrics"))
 # Output reports for use with spreadsheet applications
-reports_tab(join_paths(output_dir,"reports"))
+#reports_tab(join_paths(output_dir,"reports"))
 
 # Show only first area in reports
 first_area()
 # Full output in ODT format.
-full_odt(join_paths(output_dir,"odt"))
+#full_odt(join_paths(output_dir,"odt"))
 # Full output in ODT format.
-full_doc(join_paths(output_dir,"doc"))
+#full_doc(join_paths(output_dir,"doc"))
 
 #reports
 reports_sarif(join_paths(output_dir,"reports.sarif"))
