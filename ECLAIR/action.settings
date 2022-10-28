@@ -4,8 +4,8 @@ if [ -n "${GITLAB_CI}" ]; then
 
     artifacts_root=/home/eclair-gitlab/gitlab
     repository=${CI_PROJECT_PATH:?}
-    job_summary_file=/dev/stdout
     job_id=${CI_JOB_ID:?}
+    job_summary_file=/dev/stdout
 
     case "${CI_PIPELINE_SOURCE:?}" in
     merge_request_event)
@@ -30,8 +30,8 @@ elif [ -n "${GITHUB_ACTION}" ]; then
 
     artifacts_root=/home/eclair-github/public
     repository=${GITHUB_REPOSITORY:?}
-    job_summary_file=${GITHUB_STEP_SUMMARY:?}
     job_id=${GITHUB_RUN_NUMBER:?}
+    job_summary_file=${GITHUB_STEP_SUMMARY:?}
 
     case "${GITHUB_REF:?}" in
     refs/pull/*/merge)
