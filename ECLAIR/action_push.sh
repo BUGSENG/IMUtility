@@ -49,7 +49,7 @@ current_index_html_url=${eclair_report_url_prefix}/fs/${current_job_dir}/index.h
 
 case ${ci} in
 github)
-    cat <<EOF
+    tee summary.txt <<EOF
 [![ECLAIR](${eclair_report_url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)
 # ECLAIR analysis summary:
 Fixed reports: ${fixed_reports}
@@ -58,6 +58,12 @@ Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
 
 [Browse analysis](${current_index_html_url})
 EOF
+    gh api \
+        --method POST \
+        -H "Accept: application/vnd.github+json" \
+        /repos/"${repository}"/commits/"${commit_id}"/comments \
+        -f body=@summary.txt
+    rm summary.txt
     ;;
 gitlab)
     esc=$(printf '\e')
