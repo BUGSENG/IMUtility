@@ -62,7 +62,8 @@ EOF
         --method POST \
         -H "Accept: application/vnd.github+json" \
         /repos/"${repository}"/commits/"${commit_id}"/comments \
-        -f body=@summary.txt
+        -F body=@summary.txt \
+        --silent
     rm summary.txt
     ;;
 gitlab)
