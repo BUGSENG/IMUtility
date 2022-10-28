@@ -7,27 +7,24 @@ ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report=${ECLAIR_PATH}eclair_report
 
 usage() {
-    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID BRANCH BADGE_LABEL " >&2
+    echo "Usage: $0 ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID BRANCH BADGE_LABEL " >&2
     exit 2
 }
 
-[ $# -eq 8 ] || usage
+[ $# -eq 6 ] || usage
 
-ci=$1
-url_prefix=$2
-artifacts_dir=$3
-current_job_id=$4
-job_headline=$5
-commit_id=$6
-branch=$7
-badge_label=$8
+artifacts_dir=$1
+current_job_id=$2
+job_headline=$3
+commit_id=$4
+branch=$5
+badge_label=$6
 
 commits_dir=${artifacts_dir}/commits
 artifacts_branch_dir=${artifacts_dir}/${branch}
 current_dir=${artifacts_branch_dir}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
 current_index_html=${current_dir}/index.html
-current_index_html_url=${url_prefix}/fs${current_index_html}
 previous_index=${current_dir}/prev/index.html
 
 mkdir -p "${commits_dir}"
@@ -178,33 +175,8 @@ ln -sfn "${current_job_id}" "${latest_dir}"
 # Add a link relating commit id to latest build done for it
 ln -sfn "../${branch}/${current_job_id}" "${commits_dir}/${commit_id}"
 
-case "${ci}" in
-github)
-    # Generate summary and print it (GitHub-specific)
-    echo "[![ECLAIR](${url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)"
-    echo "# ECLAIR analysis summary:"
-    if [ -n "${latest_job_id}" ]; then
-        echo "Fixed reports: ${fixed_reports}"
-        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
-    else
-        echo "Unfixed reports: ${unfixed_reports}"
-    fi
-    echo "[Browse analysis](${current_index_html_url})"
-    ;;
-gitlab)
-    # Generate summary and print it (GitLab-specific)
-    esc=$(printf '\e')
-    cr=$(printf '\r')
-    echo "${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[92mECLAIR analysis summary${esc}[m"
-    if [ -n "${latest_job_id}" ]; then
-        echo "Fixed reports: ${fixed_reports}"
-        echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
-    else
-        echo "Unfixed reports: ${unfixed_reports}"
-    fi
-    echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
-    echo "${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K"
-    ;;
-*) ;;
-esac >"${current_dir}/summary.txt"
-cat "${current_dir}/summary.txt"
+if [ -n "${latest_job_id}" ]; then
+    echo "fixed_reports: ${fixed_reports}"
+    echo "new_reports: ${new_reports}"
+fi
+echo "unfixed_reports: ${unfixed_reports}"
