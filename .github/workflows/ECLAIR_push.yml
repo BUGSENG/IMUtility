@@ -1,9 +1,5 @@
 name: "ECLAIR push"
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+on: [workflow_dispatch, push]
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:

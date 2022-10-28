@@ -1,7 +1,6 @@
 #!/bin/sh
 
 set -e
-set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
@@ -66,7 +65,7 @@ EOF
         )
         prev_link=$(
             cat <<EOF
-<a href="prev/index.html">Previous job</a>,
+<a href="prev/index.html">Previous analysis</a>,
 EOF
         )
     else
@@ -80,18 +79,18 @@ EOF
     if [ -d "${next_dir}" ]; then
         next_link=$(
             cat <<EOF
-<a href="next/index.html">Next job</a>,
+<a href="next/index.html">Next analysis</a>,
 EOF
         )
         latest_db_msg=$(
             cat <<EOF
-<p>Browse the <a href="../latest/index.html">latest job</a></p>
+<p>Browse the <a href="../latest/index.html">latest analysis</a></p>
 EOF
         )
     else
         latest_db_msg=$(
             cat <<EOF
-<p>This is the latest job.</p>
+<p>This is the latest analysis.</p>
 EOF
         )
     fi
@@ -102,20 +101,20 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline} - ECLAIR job #${job_id}</title>
+  <title>${job_headline} - ECLAIR analysis #${job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline} - ECLAIR job #${job_id}</span>
+   <span>${job_headline} - ECLAIR analysis #${job_id}</span>
   </div>
   ${counts_msg}
   ${latest_db_msg}
   <hr>
   <p>
-   ${prev_link}${next_link}<a href="../">Jobs</a>
+   ${prev_link} ${next_link} <a href="../">All analyses</a>
   </p>
   <div class="footer"><div>
    <a href="http://bugseng.com" target="_blank">
@@ -157,10 +156,10 @@ if [ -n "${latest_job_id}" ]; then
     # Add link to next run of latest run
     ln -s "../${current_job_id}" "${latest_dir}/next"
 
-    # Generate index for the current job
+    # Generate index for the current analysis
     generate_index_html "${current_job_id}" >"${current_index_html}"
 
-    # Re-generate index for the previous job
+    # Re-generate index for the previous analysis
     previous_job_id=$(grep -o "#[0-9]*" "${previous_index}" | head -1 | cut -c2-)
     generate_index_html "${previous_job_id}" >"${previous_index}"
 
@@ -169,7 +168,7 @@ else
     echo "${unfixed_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
     anybadge -o --label="${badge_label}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
-    # Generate index for the current job
+    # Generate index for the current analysis
     generate_index_html "${current_job_id}" >"${current_index_html}"
 fi
 
@@ -196,7 +195,7 @@ gitlab)
     # Generate summary and print it (GitLab-specific)
     esc=$(printf '\e')
     cr=$(printf '\r')
-    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    echo "${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[92mECLAIR analysis summary${esc}[m"
     if [ -n "${latest_job_id}" ]; then
         echo "Fixed reports: ${fixed_reports}"
         echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
@@ -204,6 +203,7 @@ gitlab)
         echo "Unfixed reports: ${unfixed_reports}"
     fi
     echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    echo "${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K"
     ;;
 *) ;;
 esac >"${current_dir}/summary.txt"

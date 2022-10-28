@@ -1,28 +1,28 @@
 #!/bin/sh
 
 set -e
-set -x
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
 eclair_report=${ECLAIR_PATH}eclair_report
 
 usage() {
-    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID PR_ID BASE_COMMIT" >&2
+    echo "Usage: $0 CI URL_PREFIX ARTIFACTS_DIR JOB_ID JOB_HEADLINE COMMIT_ID PR_ID BASE_COMMIT REPOSITORY" >&2
     exit 2
 }
 
-[ $# -eq 8 ] || usage
+[ $# -eq 9 ] || usage
 
 ci=$1
 url_prefix=$2
 artifacts_dir=$3
-pr_id=$4
-current_job_id=$5
-job_headline=$6
+current_job_id=$4
+job_headline=$5
 #Commit id of the (implicit) merge commit created by CI (for future use)
-#commit_id=$7
+#commit_id=$
+pr_id=$7
 base_commit=$8
+repository=$9
 
 commits_dir=${artifacts_dir}/commits
 current_dir=${artifacts_dir}/pr/${current_job_id}
@@ -55,12 +55,12 @@ generate_index_html() {
         counts_msg=$(
             cat <<EOF
 <p>Fixed reports: ${fixed_reports} (<a href="${base_db_name}">Base database</a>)</p>
-<p>New reports: ${new_reports} (<a href="PROJECT.ecd">Merged database</a>)</p>
+<p>Unfixed reports: ${unfixed_reports} [new: ${new_reports}] (<a href="PROJECT.ecd">Merged database</a>)</p>
 EOF
         )
         base_link=$(
             cat <<EOF
-<p><a href="base/index.html">Base job</a></p>
+<a href="base/index.html">Base analysis</a>
 EOF
         )
     fi
@@ -71,18 +71,20 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline}: ECLAIR job #${current_job_id}</title>
+  <title>${job_headline}: ECLAIR analysis #${current_job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline}: ECLAIR job #${current_job_id}</span>
+   <span>${job_headline}: ECLAIR analysis #${current_job_id}</span>
   </div>
   ${counts_msg}
-  <br>
-  ${base_link}
+  <hr>
+  <p>
+   ${base_link} <a href="../">All PR analyses</a>
+  </p>
   <div class="footer"><div>
    <a href="http://bugseng.com" target="_blank"><img src="/rsrc/bugseng.png" alt="BUGSENG">
     <span class="tagline">software verification done right.</span>
@@ -122,7 +124,7 @@ else
     # TODO: what to do?
     #anybadge -o --label="ECLAIR ${current_job_id}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
-    # Generate index for the current job
+    # Generate index for the current analysis
     generate_index_html >"${current_index_html}"
 fi
 
@@ -139,22 +141,21 @@ gitlab)
     esc=$(printf '\e')
     cr=$(printf '\r')
     # Generate summary and print it (GitLab-specific)
-    echo "${esc}[0KECLAIR analysis summary:${cr}"
+    echo "${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[92mECLAIR analysis summary${esc}[m"
     echo "Fixed reports: ${fixed_reports}"
     echo "Unfixed reports: ${unfixed_reports} [new: ${new_reports}]"
     echo "Browse analysys: ${esc}[33m${current_index_html_url}${esc}[m"
+    echo "${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K"
     ;;
 *) ;;
 esac >"${current_dir}/summary.txt"
 cat "${current_dir}/summary.txt"
 
 if [ "${ci}" = github ]; then
-    # Create a comment on the PR
-    repo=${job_headline}
     gh api \
         --method POST \
         -H "Accept: application/vnd.github.raw+json" \
-        "/repos/${repo}/issues/${pr_id}/comments" \
+        "/repos/${repository}/issues/${pr_id}/comments" \
         -F body='@'"${current_dir}/summary.txt" \
         --silent
 fi
