@@ -49,8 +49,7 @@ current_index_html_url=${eclair_report_url_prefix}/fs/${current_job_dir}/index.h
 summary_txt_file="summary.txt"
 
 cat <<EOF >"${summary_txt_file}"
-[![ECLAIR](${eclair_report_url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)
-# ECLAIR analysis summary:
+# [![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
 Fixed reports: ${fixed_reports}
 
 Unfixed reports: ${unfixed_reports} [new: ${new_reports}]

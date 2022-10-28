@@ -45,26 +45,44 @@ done <"${update_yml}"
 
 current_index_html_url=${eclair_report_url_prefix}/fs/${current_job_dir}/index.html
 
-[ "${job_summary_file}" = /dev/stdout ] || exec >"${job_summary_file}"
+summary_txt_file=summary.txt
 
-case ${ci} in
-github)
-    tee summary.txt <<EOF
-[![ECLAIR](${eclair_report_url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair)
-# ECLAIR analysis summary:
+cat <<EOF >"${summary_txt_file}"
+# [![ECLAIR](https://eclairit.com:3787/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
+Branch: ${branch}
+
 Fixed reports: ${fixed_reports}
 
 Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
 
 [Browse analysis](${current_index_html_url})
 EOF
+
+case ${ci} in
+github)
     gh api \
         --method POST \
         -H "Accept: application/vnd.github+json" \
         /repos/"${repository}"/commits/"${commit_id}"/comments \
-        -F body=@summary.txt \
+        -F body=@${summary_txt_file} \
         --silent
-    rm summary.txt
+    ;;
+gitlab)
+    set -x
+    curl --request POST \
+        "https://eclairit.com:8444/api/v4/projects/${CI_PROJECT_ID:?}/repository/commits/${CI_COMMIT_SHA:?}/comments" \
+        -H "PRIVATE-TOKEN: ${ECLAIRIT_TOKEN?:}" \
+        -F note="<${summary_txt_file}" \
+        --silent
+    ;;
+*) ;;
+esac
+
+[ "${job_summary_file}" = /dev/stdout ] || exec >"${job_summary_file}"
+
+case ${ci} in
+github)
+    cat "${summary_txt_file}"
     ;;
 gitlab)
     esc=$(printf '\e')
