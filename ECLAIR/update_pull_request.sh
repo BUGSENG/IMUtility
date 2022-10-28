@@ -18,8 +18,8 @@ current_job_id=$2
 job_headline=$3
 base_commit_id=$4
 
-commits_dir=${artifacts_dir}/commits
-current_dir=${artifacts_dir}/pr/${current_job_id}
+commits_dir=${artifacts_dir:?}/commits
+current_dir=${artifacts_dir:?}/pr/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
 current_index_html=${current_dir}/index.html
 
@@ -64,14 +64,14 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline}: ECLAIR analysis #${current_job_id}</title>
+  <title>${job_headline:?}: ECLAIR analysis #${current_job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline}: ECLAIR analysis #${current_job_id}</span>
+   <span>${job_headline:?}: ECLAIR analysis #${current_job_id}</span>
   </div>
   ${counts_msg}
   <hr>
