@@ -62,15 +62,14 @@ github)
     gh api \
         --method POST \
         "/repos/${repository}/issues/${pr_id}/comments" \
-        -H "Accept: application/vnd.github.raw+json" \
-        -F body="@${summary_txt_file}" \
+        -F "body=@${summary_txt_file}" \
         --silent
     ;;
 gitlab)
     curl --request POST \
         "https://eclairit.com:8444/api/v4/projects/${CI_PROJECT_ID?:}/merge_requests/${pr_id}/notes" \
         -H "PRIVATE-TOKEN: ${ECLAIRIT_TOKEN?:}" \
-        -F body="<${summary_txt_file}" \
+        -F "body=<${summary_txt_file}" \
         --silent
     ;;
 *) ;;

@@ -62,17 +62,15 @@ case ${ci} in
 github)
     gh api \
         --method POST \
-        -H "Accept: application/vnd.github+json" \
         /repos/"${repository}"/commits/"${commit_id}"/comments \
-        -F body=@${summary_txt_file} \
+        -F "body=@${summary_txt_file}" \
         --silent
     ;;
 gitlab)
-    set -x
     curl --request POST \
         "https://eclairit.com:8444/api/v4/projects/${CI_PROJECT_ID:?}/repository/commits/${CI_COMMIT_SHA:?}/comments" \
         -H "PRIVATE-TOKEN: ${ECLAIRIT_TOKEN?:}" \
-        -F note="<${summary_txt_file}" \
+        -F "note=<${summary_txt_file}" \
         --silent
     ;;
 *) ;;
