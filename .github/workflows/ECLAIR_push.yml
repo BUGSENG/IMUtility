@@ -14,8 +14,8 @@ jobs:
     - name: Analyze
       run: |
         set -e
+        ./prepare.sh
         cd ECLAIR
-        ../prepare.sh
         ./analyze.sh
         ./action_push.sh out "${GITHUB_SHA}"
     - name: Upload SARIF
