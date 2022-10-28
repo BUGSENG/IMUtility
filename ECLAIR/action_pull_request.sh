@@ -18,7 +18,7 @@ analysis_output_dir=$1
 #commit_id=$2
 base_commit_id=$3
 
-current_job_dir=${eclair_report_host_scp:?}${artifacts_dir:?}/pr/${job_id:?}
+current_job_dir=${artifacts_dir:?}/pr/${job_id:?}
 
 # create a directory for the analysis artifacts
 ${eclair_report_host_sh:?} "mkdir -p '${current_job_dir}'"
@@ -27,8 +27,7 @@ ${eclair_report_host_sh:?} "mkdir -p '${current_job_dir}'"
 scp "${analysis_output_dir}/PROJECT.ecd" "${current_job_dir}"
 
 # Send the scripts to eclair report host
-scp update_pull_request.sh \
-    "${eclair_report_host_scp:?}${current_job_dir}"
+eclair_report_host_cp update_pull_request.sh "${current_job_dir}"
 
 update_yml=${analysis_output_dir}/update.yml
 

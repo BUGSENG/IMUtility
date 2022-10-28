@@ -60,8 +60,11 @@ fi
 
 # Common settings
 eclair_report_url_prefix=https://eclairit.com:3787
-eclair_report_host_scp=
 eclair_report_host_sh="sh -c"
+
+eclair_report_host_cp() {
+    cp "$1" "$2"
+}
 
 artifacts_dir=${artifacts_root}/${repository}.ecdf
 

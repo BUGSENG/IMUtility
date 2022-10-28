@@ -17,7 +17,7 @@ usage() {
 analysis_output_dir=$1
 commit_id=$2
 
-current_job_dir=${eclair_report_host_scp:?}${artifacts_dir:?}/${branch:?}/${job_id:?}
+current_job_dir=${artifacts_dir:?}/${branch:?}/${job_id:?}
 
 # create a directory for the analysis artifacts
 ${eclair_report_host_sh:?} "mkdir -p '${current_job_dir}'"
@@ -26,8 +26,7 @@ ${eclair_report_host_sh:?} "mkdir -p '${current_job_dir}'"
 scp "${analysis_output_dir}/PROJECT.ecd" "${current_job_dir}"
 
 # Send the scripts to eclair report host
-scp update_push.sh \
-    "${eclair_report_host_scp:?}${current_job_dir}"
+eclair_report_host_cp update_push.sh "${current_job_dir}"
 
 update_yml=${analysis_output_dir}/update.yml
 ${eclair_report_host_sh:?} "${current_job_dir}/update_push.sh \
