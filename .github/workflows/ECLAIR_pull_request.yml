@@ -6,7 +6,7 @@ env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 jobs:
   Analyze:
-    runs-on: self-hosted
+    runs-on: eclairit
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -20,8 +20,8 @@ jobs:
         PR_USER: ${{ github.event.pull_request.user.login }}
       run: |
         set -e
+        ./prepare.sh
         cd ECLAIR
-        ../prepare.sh
         ./analyze.sh
         ./action_pull_request.sh out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
     - name: Upload SARIF
