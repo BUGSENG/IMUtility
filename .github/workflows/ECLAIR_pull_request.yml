@@ -10,6 +10,8 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        submodules: 'true'
     - name: Analyze
       env:
         PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}

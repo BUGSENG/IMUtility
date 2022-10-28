@@ -8,11 +8,14 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+      with:
+        submodules: 'true'
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Analyze
       run: |
         set -e
+        ./prepare.sh
         cd ECLAIR
-        ../prepare.sh
         ./analyze.sh
         ./action_push.sh out "${GITHUB_SHA}"
     - name: Upload SARIF
