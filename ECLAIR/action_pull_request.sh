@@ -66,8 +66,8 @@ github)
     ;;
 gitlab)
     curl --request POST \
-        "${gitlab_api_url}/projects/${CI_PROJECT_ID?:}/merge_requests/${pull_request_id}/notes" \
-        -H "PRIVATE-TOKEN: ${gitlab_bot_token?:}" \
+        "${gitlab_api_url}/projects/${CI_PROJECT_ID}/merge_requests/${pull_request_id}/notes" \
+        -H "PRIVATE-TOKEN: ${gitlab_bot_token}" \
         -F "body=<${summary_txt_file}" \
         --silent
     ;;

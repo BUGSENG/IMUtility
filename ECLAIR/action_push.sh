@@ -68,7 +68,7 @@ github)
 gitlab)
     curl --request POST \
         "${gitlab_api_url}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/comments" \
-        -H "PRIVATE-TOKEN: ${gitlab_bot_token?:}" \
+        -H "PRIVATE-TOKEN: ${gitlab_bot_token}" \
         -F "note=<${summary_txt_file}" \
         --silent
     ;;
