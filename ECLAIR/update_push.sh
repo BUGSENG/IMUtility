@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -eu
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
