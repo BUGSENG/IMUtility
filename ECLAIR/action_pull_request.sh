@@ -49,6 +49,8 @@ summary_txt_file="summary.txt"
 
 cat <<EOF >"${summary_txt_file}"
 # [![ECLAIR](${eclair_report_url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
+Branch: ${pull_request_head_ref} -> ${pull_request_base_ref}
+
 Fixed reports: ${fixed_reports}
 
 Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
