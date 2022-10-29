@@ -3,7 +3,7 @@ if [ -n "${GITLAB_CI+x}" ]; then
     ci=gitlab
 
     gitlab_api_url="https://eclairit.com:8444/api/v4"
-    gitlab_bot_token="${ECLAIRIT_TOKEN?:}"
+    gitlab_bot_token="${ECLAIRIT_TOKEN}"
     artifacts_root=/home/eclair-gitlab/gitlab
     repository=${CI_PROJECT_PATH}
     job_id=${CI_JOB_ID}
