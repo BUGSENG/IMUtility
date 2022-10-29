@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -eu
 
 cd "$(dirname "$0")"
 
@@ -18,10 +18,10 @@ analysis_output_dir=$1
 #commit_id=$2
 base_commit_id=$3
 
-current_job_dir=${artifacts_dir:?}/pr/${job_id:?}
+current_job_dir=${artifacts_dir}/pr/${job_id}
 
 # create a directory for the analysis artifacts
-${eclair_report_host_sh:?} "mkdir -p '${current_job_dir}'"
+${eclair_report_host_sh} "mkdir -p '${current_job_dir}'"
 
 # Transfer the database to eclair_report_host
 scp "${analysis_output_dir}/PROJECT.ecd" "${current_job_dir}"
@@ -31,8 +31,8 @@ eclair_report_host_cp update_pull_request.sh "${current_job_dir}"
 
 update_yml=${analysis_output_dir}/update.yml
 
-${eclair_report_host_sh:?} "${current_job_dir}/update_pull_request.sh \
-'${artifacts_dir:?}' '${job_id:?}' '${job_headline:?}' \
+${eclair_report_host_sh} "${current_job_dir}/update_pull_request.sh \
+'${artifacts_dir}' '${job_id}' '${job_headline}' \
 '${base_commit_id}'" >"${update_yml}"
 
 fixed_reports=
@@ -44,11 +44,11 @@ while read -r line; do
     eval "${var}"="${val}"
 done <"${update_yml}"
 
-current_index_html_url=${eclair_report_url_prefix:?}/fs/${current_job_dir}/index.html
+current_index_html_url=${eclair_report_url_prefix}/fs/${current_job_dir}/index.html
 summary_txt_file="summary.txt"
 
 cat <<EOF >"${summary_txt_file}"
-# [![ECLAIR](${eclair_report_url_prefix:?}/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
+# [![ECLAIR](${eclair_report_url_prefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
 Fixed reports: ${fixed_reports}
 
 Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
@@ -56,17 +56,17 @@ Unfixed reports: ${unfixed_reports} [new: ${new_reports}]
 [Browse analysis](${current_index_html_url})
 EOF
 
-case ${ci:?} in
+case ${ci} in
 github)
     gh api \
         --method POST \
-        "/repos/${repository:?}/issues/${pull_request_id:?}/comments" \
+        "/repos/${repository}/issues/${pull_request_id}/comments" \
         -F "body=@${summary_txt_file}" \
         --silent
     ;;
 gitlab)
     curl --request POST \
-        "${gitlab_api_url:?}/projects/${CI_PROJECT_ID?:}/merge_requests/${pull_request_id:?}/notes" \
+        "${gitlab_api_url}/projects/${CI_PROJECT_ID?:}/merge_requests/${pull_request_id}/notes" \
         -H "PRIVATE-TOKEN: ${gitlab_bot_token?:}" \
         -F "body=<${summary_txt_file}" \
         --silent
@@ -74,9 +74,9 @@ gitlab)
 *) ;;
 esac
 
-case ${ci:?} in
+case ${ci} in
 github)
-    cat "${summary_txt_file}" > "${GITHUB_STEP_SUMMARY:?}"
+    cat "${summary_txt_file}" > "${GITHUB_STEP_SUMMARY}"
     ;;
 gitlab)
     esc=$(printf '\e')

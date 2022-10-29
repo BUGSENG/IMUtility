@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -e
+set -eu
 
 # To be adjusted to local setup
 ECLAIR_PATH=${ECLAIR_PATH:-/opt/bugseng/eclair/bin/}
@@ -20,8 +20,8 @@ commit_id=$4
 branch=$5
 badge_label=$6
 
-commits_dir=${artifacts_dir:?}/commits
-artifacts_branch_dir=${artifacts_dir:?}/${branch:?}
+commits_dir=${artifacts_dir}/commits
+artifacts_branch_dir=${artifacts_dir}/${branch}
 current_dir=${artifacts_branch_dir}/${current_job_id}
 current_db=${current_dir}/PROJECT.ecd
 current_index_html=${current_dir}/index.html
@@ -40,7 +40,7 @@ latest_job_id=
 generate_index_html() {
 
     job_id=$1
-    job_dir=${artifacts_branch_dir}/${job_id:?}
+    job_dir=${artifacts_branch_dir}/${job_id}
     prev_dir=${job_dir}/prev
     next_dir=${job_dir}/next
 
@@ -98,14 +98,14 @@ EOF
  <head>
   <meta charset="utf-8">
   <link href="/rsrc/overall.css" rel="stylesheet" type="text/css">
-  <title>${job_headline:?} - ECLAIR analysis #${job_id:?}</title>
+  <title>${job_headline} - ECLAIR analysis #${job_id}</title>
  </head>
  <body>
   <div class="header">
    <a href="http://bugseng.com/eclair" target="_blank">
     <img src="/rsrc/eclair.png" alt="ECLAIR">
    </a>
-   <span>${job_headline:?} - ECLAIR analysis #${job_id:?}</span>
+   <span>${job_headline} - ECLAIR analysis #${job_id}</span>
   </div>
   ${counts_msg}
   ${latest_db_msg}
@@ -145,7 +145,7 @@ if [ -n "${latest_job_id}" ]; then
     echo "${new_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
 
     # Generate badge for the current run
-    anybadge -o --label="${badge_label:?}" --value="fixed ${fixed_reports} | unfixed ${unfixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="${badge_label}" --value="fixed ${fixed_reports} | unfixed ${unfixed_reports} | new ${new_reports}" --file="${current_dir}/badge.svg"
 
     # Add link to previous run of current run
     ln -s "../${latest_job_id}" "${current_dir}/prev"
@@ -163,7 +163,7 @@ if [ -n "${latest_job_id}" ]; then
 else
 
     echo "${unfixed_reports}" >"${artifacts_branch_dir}/${current_job_id}/new_reports.txt"
-    anybadge -o --label="${badge_label:?}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
+    anybadge -o --label="${badge_label}" --value="unfixed: ${unfixed_reports}" --file="${current_dir}/badge.svg"
 
     # Generate index for the current analysis
     generate_index_html "${current_job_id}" >"${current_index_html}"
@@ -173,7 +173,7 @@ fi
 ln -sfn "${current_job_id}" "${latest_dir}"
 
 # Add a link relating commit id to latest build done for it
-ln -sfn "../${branch:?}/${current_job_id}" "${commits_dir}/${commit_id}"
+ln -sfn "../${branch}/${current_job_id}" "${commits_dir}/${commit_id}"
 
 if [ -n "${latest_job_id}" ]; then
     echo "fixed_reports: ${fixed_reports}"

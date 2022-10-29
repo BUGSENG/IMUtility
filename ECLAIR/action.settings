@@ -1,47 +1,47 @@
 # Fit to repo setup, and add to the ECLAIR folder
-if [ -n "${GITLAB_CI}" ]; then
+if [ -n "${GITLAB_CI+x}" ]; then
     ci=gitlab
 
     gitlab_api_url="https://eclairit.com:8444/api/v4"
     gitlab_bot_token="${ECLAIRIT_TOKEN?:}"
     artifacts_root=/home/eclair-gitlab/gitlab
-    repository=${CI_PROJECT_PATH:?}
-    job_id=${CI_JOB_ID:?}
+    repository=${CI_PROJECT_PATH}
+    job_id=${CI_JOB_ID}
 
-    case "${CI_PIPELINE_SOURCE:?}" in
+    case "${CI_PIPELINE_SOURCE}" in
     merge_request_event)
         event="pull_request"
-        pull_request_id=${CI_MERGE_REQUEST_IID:?}
-        pull_request_head_ref=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME:?}
-        pull_request_base_ref=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME:?}
-        pull_request_user=${GITLAB_USER_LOGIN:?}
+        pull_request_id=${CI_MERGE_REQUEST_IID}
+        pull_request_head_ref=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+        pull_request_base_ref=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+        pull_request_user=${GITLAB_USER_LOGIN}
         ;;
     push)
         event="push"
-        branch=${CI_COMMIT_BRANCH:?}
+        branch=${CI_COMMIT_BRANCH}
         ;;
     *)
         echo "Unexpected event ${CI_PIPELINE_SOURCE}" >&2
         exit 1
         ;;
     esac
-elif [ -n "${GITHUB_ACTION}" ]; then
+elif [ -n "${GITHUB_ACTION+x}" ]; then
     # Fit to repo setup, and add to the ECLAIR folder
     ci=github
 
     artifacts_root=/home/eclair-github/public
-    repository=${GITHUB_REPOSITORY:?}
-    job_id=${GITHUB_RUN_NUMBER:?}
+    repository=${GITHUB_REPOSITORY}
+    job_id=${GITHUB_RUN_NUMBER}
 
-    case "${GITHUB_REF:?}" in
+    case "${GITHUB_REF}" in
     refs/pull/*/merge)
         event="pull_request"
         # Extract PR number from "refs/pull/<prnum>/merge"
         pull_request_id=${GITHUB_REF#refs/pull/}
         pull_request_id=${pull_request_id%/merge}
-        pull_request_head_ref=${PR_HEAD_REF:?}
-        pull_request_base_ref=${PR_BASE_REF:?}
-        pull_request_user=${PR_USER:?}
+        pull_request_head_ref=${PR_HEAD_REF}
+        pull_request_base_ref=${PR_BASE_REF}
+        pull_request_user=${PR_USER}
         ;;
     refs/heads/*)
         event="push"
@@ -68,14 +68,13 @@ eclair_report_host_cp() {
 
 artifacts_dir=${artifacts_root}/${repository}.ecdf
 
-badge_label="ECLAIR ${branch} #${job_id}"
-
 case "${event}" in
 pull_request)
     job_headline="${pull_request_user} wants to merge ${pull_request_head_ref} into ${pull_request_base_ref}"
     ;;
 push)
     job_headline="${repository} (${branch})"
+    badge_label="ECLAIR ${branch} #${job_id}"
     ;;
 *)
     echo "Unexpected Event ${event}" >&2
