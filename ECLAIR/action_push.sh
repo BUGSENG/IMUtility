@@ -1,6 +1,6 @@
 #!/bin/sh
 
-set -eux
+set -eu
 
 cd "$(dirname "$0")"
 
@@ -19,7 +19,7 @@ commitId=$3
 . ./action.settings
 
 curl "${eclairReportUrlPrefix}/ext/update_push" \
--F "woken=${wtoken}" \
+-F "wtoken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
 -F "subDir=${subDir}" \
 -F "jobId=${jobId}" \
