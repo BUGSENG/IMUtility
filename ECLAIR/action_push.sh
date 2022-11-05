@@ -11,12 +11,12 @@ usage() {
 
 [ $# -eq 3 ] || usage
 
-# Source variables
-. ./action.settings
-
 wtoken=$1
 analysisOutputDir=$2
 commitId=$3
+
+# Source variables
+. ./action.settings
 
 curl "${eclairReportUrlPrefix}/ext/update_push" \
 -F "woken=${wtoken}" \
