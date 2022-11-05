@@ -2,19 +2,22 @@
 if [ -n "${GITLAB_CI+x}" ]; then
     ci=gitlab
 
-    gitlab_api_url="https://eclairit.com:8444/api/v4"
-    gitlab_bot_token="${ECLAIRIT_TOKEN}"
-    artifacts_root=/home/eclair-gitlab/gitlab
+    # To be customized
+    gitlabApiUrl="https://eclairit.com:8444/api/v4"
+    # To be customized
+    gitlabBotToken="${ECLAIRIT_TOKEN}"
+    # To be customized
+    artifactsRoot=/home/eclair-gitlab/gitlab
     repository=${CI_PROJECT_PATH}
-    job_id=${CI_JOB_ID}
+    jobId=${CI_JOB_ID}
 
     case "${CI_PIPELINE_SOURCE}" in
     merge_request_event)
         event="pull_request"
-        pull_request_id=${CI_MERGE_REQUEST_IID}
-        pull_request_head_ref=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
-        pull_request_base_ref=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
-        pull_request_user=${GITLAB_USER_LOGIN}
+        pullRequestId=${CI_MERGE_REQUEST_IID}
+        pullRequestHeadRef=${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+        pullRequestBaseRef=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
+        pullRequestUser=${GITLAB_USER_LOGIN}
         ;;
     push)
         event="push"
@@ -29,19 +32,20 @@ elif [ -n "${GITHUB_ACTION+x}" ]; then
     # Fit to repo setup, and add to the ECLAIR folder
     ci=github
 
-    artifacts_root=/home/eclair-github/public
+    # To be customized
+    artifactsRoot=/home/eclair-github/public
     repository=${GITHUB_REPOSITORY}
-    job_id=${GITHUB_RUN_NUMBER}
+    jobId=${GITHUB_RUN_NUMBER}
 
     case "${GITHUB_REF}" in
     refs/pull/*/merge)
         event="pull_request"
         # Extract PR number from "refs/pull/<prnum>/merge"
-        pull_request_id=${GITHUB_REF#refs/pull/}
-        pull_request_id=${pull_request_id%/merge}
-        pull_request_head_ref=${PR_HEAD_REF}
-        pull_request_base_ref=${PR_BASE_REF}
-        pull_request_user=${PR_USER}
+        pullRequestId=${GITHUB_REF#refs/pull/}
+        pullRequestId=${pullRequestId%/merge}
+        pullRequestHeadRef=${PR_HEAD_REF}
+        pullRequestBaseRef=${PR_BASE_REF}
+        pullRequestUser=${PR_USER}
         ;;
     refs/heads/*)
         event="push"
@@ -58,26 +62,72 @@ else
     exit 1
 fi
 
-# Common settings
-eclair_report_url_prefix=https://eclairit.com:3787
-eclair_report_host_sh="sh -c"
-
-eclair_report_host_cp() {
-    cp "$1" "$2"
-}
-
-artifacts_dir=${artifacts_root}/${repository}.ecdf
-
 case "${event}" in
 pull_request)
-    job_headline="${pull_request_user} wants to merge ${pull_request_head_ref} into ${pull_request_base_ref}"
+    subDir="${pullRequestHeadRef}_${pullRequestBaseRef}"
+    jobHeadline="Repository ${repository}: ${pullRequestUser} wants to merge ${pullRequestHeadRef} into ${pullRequestBaseRef}"
     ;;
 push)
-    job_headline="${repository} (${branch})"
-    badge_label="ECLAIR ${branch} #${job_id}"
+    subDir="${branch}"
+    jobHeadline="Repository ${repository}: branch ${branch}"
+    badgeLabel="ECLAIR ${branch} #${jobId}"
     ;;
 *)
-    echo "Unexpected Event ${event}" >&2
+    echo "Unexpected event ${event}" >&2
     exit 1
     ;;
 esac
+
+# To be customized
+eclairReportUrlPrefix=https://eclairit.com:3787
+
+artifactsDir=${artifactsRoot}/${repository}.ecdf
+jobDir=${artifactsDir}/${subDir}/${jobId}
+updateYml=${analysisOutputDir}/update.yml
+indexHtmlUrl=${eclairReportUrlPrefix}/fs${jobDir}/index.html
+summaryTxtFile="${analysisOutputDir}/summary.txt"
+
+summary() {
+    fixedReports=
+    newReports=
+    unfixedReports=
+    while read -r line; do
+        var=${line%%: *}
+        val=${line#*: }
+        eval "${var}=${val}"
+    done <"${updateYml}"
+
+    cat <<EOF >"${summaryTxtFile}"
+# [![ECLAIR](${eclairReportUrlPrefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
+${jobHeadline}
+
+Fixed reports: ${fixedReports}
+
+Unfixed reports: ${unfixedReports} [new: ${newReports}]
+
+[Browse analysis](${indexHtmlUrl})
+EOF
+
+    case ${ci} in
+    github)
+        cat "${summaryTxtFile}" >"${GITHUB_STEP_SUMMARY}"
+        ;;
+    gitlab)
+        esc=$(printf '\e')
+        cr=$(printf '\r')
+        # Generate summary and print it (GitLab-specific)
+        cat <<EOF
+${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[36mECLAIR analysis summary${esc}[m
+Fixed reports: ${fixedReports}
+Unfixed reports: ${unfixedReports} [new: ${newReports}]
+Browse analysys: ${esc}[33m${indexHtmlUrl}${esc}[m
+${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K
+EOF
+        ;;
+    *)
+        echo "Unexpected CI/CD context" >&2
+        exit 1
+        ;;
+    esac
+}
+
