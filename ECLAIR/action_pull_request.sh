@@ -22,7 +22,7 @@ baseCommitId=$4
 curl "${eclairReportUrlPrefix}/ext/update_pull_request" \
 -F "woken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
--F "subDir=${pullRequestHeadRef}_${pullRequestBaseRef}" \
+-F "subDir=${subDir}" \
 -F "jobId=${jobId}" \
 -F "jobHeadline=${jobHeadline}" \
 -F "baseCommitId=${baseCommitId}" \

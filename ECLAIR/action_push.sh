@@ -21,7 +21,7 @@ commitId=$3
 curl "${eclairReportUrlPrefix}/ext/update_push" \
 -F "woken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
--F "subDir=${pullRequestHeadRef}_${pullRequestBaseRef}" \
+-F "subDir=${subDir}" \
 -F "jobId=${jobId}" \
 -F "jobHeadline=${jobHeadline}" \
 -F "commitId=${commitId}" \
