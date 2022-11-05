@@ -18,7 +18,7 @@ commitId=$3
 # Source variables
 . ./action.settings
 
-curl "${eclairReportUrlPrefix}/ext/update_push" \
+curl -sS "${eclairReportUrlPrefix}/ext/update_push" \
 -F "wtoken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
 -F "subDir=${subDir}" \
@@ -40,11 +40,10 @@ github)
         --silent
     ;;
 gitlab)
-    curl --request POST \
+    curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/comments" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "note=<${summaryTxtFile}" \
-        --silent
+        -F "note=<${summaryTxtFile}"
     ;;
 *) ;;
 esac

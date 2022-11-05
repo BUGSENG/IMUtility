@@ -19,7 +19,7 @@ baseCommitId=$4
 # Source variables
 . ./action.settings
 
-curl "${eclairReportUrlPrefix}/ext/update_pull_request" \
+curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
 -F "wtoken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
 -F "subDir=${subDir}" \
@@ -40,11 +40,10 @@ github)
         --silent
     ;;
 gitlab)
-    curl --request POST \
+    curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/merge_requests/${pullRequestId}/notes" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "body=<${summaryTxtFile}" \
-        --silent
+        -F "body=<${summaryTxtFile}"
     ;;
 *) ;;
 esac
