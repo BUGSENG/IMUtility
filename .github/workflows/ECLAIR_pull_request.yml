@@ -4,6 +4,7 @@ on:
     types: ['opened', 'synchronize']
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WTOKEN: ${{ secrets.WTOKEN }}
 jobs:
   Analyze:
     runs-on: eclairit
@@ -23,7 +24,7 @@ jobs:
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh
-        ./action_pull_request.sh out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
+        ./action_pull_request.sh "${WTOKEN}" out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh

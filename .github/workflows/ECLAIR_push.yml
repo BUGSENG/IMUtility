@@ -2,6 +2,7 @@ name: "ECLAIR push"
 on: [workflow_dispatch, push]
 env:
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  WTOKEN: ${{ secrets.WTOKEN }}
 jobs:
   Analyze:
     runs-on: eclairit
@@ -16,7 +17,7 @@ jobs:
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh
-        ./action_push.sh out "${GITHUB_SHA}"
+        ./action_push.sh "${WTOKEN}" out "${GITHUB_SHA}"
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh
