@@ -84,7 +84,7 @@ eclairReportUrlPrefix=https://eclairit.com:3787
 artifactsDir=${artifactsRoot}/${repository}.ecdf
 jobDir=${artifactsDir}/${subDir}/${jobId}
 updateYml=${analysisOutputDir}/update.yml
-indexHtmlUrl=${eclairReportUrlPrefix}/fs/${jobDir}/index.html
+indexHtmlUrl=${eclairReportUrlPrefix}/fs${jobDir}/index.html
 summaryTxtFile="${analysisOutputDir}/summary.txt"
 
 summary() {
