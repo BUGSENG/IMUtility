@@ -20,7 +20,7 @@ baseCommitId=$4
 . ./action.settings
 
 curl "${eclairReportUrlPrefix}/ext/update_pull_request" \
--F "woken=${wtoken}" \
+-F "wtoken=${wtoken}" \
 -F "artifactsDir=${artifactsDir}" \
 -F "subDir=${subDir}" \
 -F "jobId=${jobId}" \
