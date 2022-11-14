@@ -17,7 +17,7 @@ baseCommitId=$4
 # Source variables
 . "$(dirname "$0")/action.settings"
 
-if ! curl -sS --fail-with-body "${eclairReportUrlPrefix}/ext/update_pull_request" \
+curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
     -F "wtoken=${wtoken}" \
     -F "artifactsDir=${artifactsDir}" \
     -F "subDir=${subDir}" \
@@ -25,7 +25,8 @@ if ! curl -sS --fail-with-body "${eclairReportUrlPrefix}/ext/update_pull_request
     -F "jobHeadline=${jobHeadline}" \
     -F "baseCommitId=${baseCommitId}" \
     -F "db=@${analysisOutputDir}/PROJECT.ecd" \
-    >"${updateYml}"; then
+    >"${updateYml}"
+if ! grep -Fq "unfixedReports: " "${updateYml}"; then
     cat "${updateYml}"
     exit 1
 fi
@@ -41,7 +42,7 @@ github)
         --silent
     ;;
 gitlab)
-    curl -sS --fail-with-body --request POST \
+    curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/merge_requests/${pullRequestId}/notes" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
         -F "body=<${summaryTxtFile}"
