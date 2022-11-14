@@ -1,9 +1,16 @@
 # Fit to repo setup, and add to the ECLAIR folder
+
+variantSubDir=
+variantHeadline=
+if [ -n "${VARIANT+x}" ]; then
+    variantSubDir="/${VARIANT}"
+    variantHeadline=" [${VARIANT}]"
+fi
+
 if [ -n "${GITLAB_CI+x}" ]; then
     ci=gitlab
 
-    # To be customized
-    gitlabApiUrl="https://eclairit.com:8444/api/v4"
+    gitlabApiUrl="${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4"
     # To be customized
     gitlabBotToken="${ECLAIRIT_TOKEN}"
     # To be customized
@@ -19,7 +26,7 @@ if [ -n "${GITLAB_CI+x}" ]; then
         pullRequestBaseRef=${CI_MERGE_REQUEST_TARGET_BRANCH_NAME}
         pullRequestUser=${GITLAB_USER_LOGIN}
         ;;
-    push)
+    push | pipeline)
         event="push"
         branch=${CI_COMMIT_BRANCH}
         ;;
@@ -70,13 +77,16 @@ pull_request)
 push)
     subDir="${branch}"
     jobHeadline="Repository ${repository}: branch ${branch}"
-    badgeLabel="ECLAIR ${branch} #${jobId}"
+    badgeLabel="ECLAIR ${branch}${variantHeadline} #${jobId}"
     ;;
 *)
     echo "Unexpected event ${event}" >&2
     exit 1
     ;;
 esac
+
+subDir="${subDir}${variantSubDir}"
+jobHeadline="${jobHeadline}${variantHeadline}"
 
 # To be customized
 eclairReportUrlPrefix=https://eclairit.com:3787
@@ -130,4 +140,3 @@ EOF
         ;;
     esac
 }
-
