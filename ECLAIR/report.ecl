@@ -5,6 +5,7 @@ quiet()
 setq(data_dir,getenv("ECLAIR_DATA_DIR"))
 setq(output_dir,getenv("ECLAIR_OUTPUT_DIR"))
 setq(ecd_file,getenv("ECLAIR_PROJECT_ECD"))
+setq(sarif_file,getenv("ECLAIR_REPORTS_SARIF"))
 
 create_db(ecd_file)
 loading()
@@ -28,4 +29,4 @@ first_area()
 #full_doc(join_paths(output_dir,"doc"))
 
 #reports
-reports_sarif(join_paths(output_dir,"reports.sarif"))
+reports_sarif(sarif_file)

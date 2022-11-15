@@ -4,7 +4,9 @@ set -eu
 
 cd "$(dirname "$0")"
 
-gzip -c out/reports.sarif | base64 -w0 >reports.sarif.gz.b64
+. "./eclair_settings.sh"
+
+gzip -c "${ECLAIR_REPORTS_SARIF}" | base64 -w0 > reports.sarif.gz.b64
 
 gh api --method POST -H "Accept: application/vnd.github+json" \
     /repos/"${GITHUB_REPOSITORY}"/code-scanning/sarifs \
