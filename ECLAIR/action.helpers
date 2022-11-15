@@ -7,6 +7,9 @@ else
     exit 1
 fi
 
+esc=$(printf '\e')
+cr=$(printf '\r')
+
 open_section() {
     id=$1
     title=$2
