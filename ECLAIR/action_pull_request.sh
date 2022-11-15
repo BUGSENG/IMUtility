@@ -26,10 +26,9 @@ curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
     -F "baseCommitId=${baseCommitId}" \
     -F "db=@${analysisOutputDir}/PROJECT.ecd" \
     >"${updateYml}"
-if ! grep -Fq "unfixedReports: " "${updateYml}"; then
-    cat "${updateYml}"
-    exit 1
-fi
+ex=0
+grep -Fq "unfixedReports: " "${updateYml}" || ex=$?
+maybe_log_file_exit PUBLISH_RESULT "Publishing results" "${updateYml}" "${ex}"
 
 summary
 
@@ -45,7 +44,10 @@ gitlab)
     curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/merge_requests/${pullRequestId}/notes" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "body=<${summaryTxtFile}"
+        -F "body=<${summaryTxtFile}" >"${commentJson}"
+    ex=0
+    grep -Fq "UnfixedReports: " "${commentJson}" || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentJson}" "${ex}"
     ;;
 *) ;;
 esac

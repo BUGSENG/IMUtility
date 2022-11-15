@@ -26,10 +26,9 @@ curl -sS "${eclairReportUrlPrefix}/ext/update_push" \
     -F "badgeLabel=${badgeLabel}" \
     -F "db=@${analysisOutputDir}/PROJECT.ecd" \
     >"${updateYml}"
-if ! grep -Fq "unfixedReports: " "${updateYml}"; then
-    cat "${updateYml}"
-    exit 1
-fi
+ex=0
+grep -Fq "unfixedReports: " "${updateYml}" || ex=$?
+maybe_log_file_exit PUBLISH_RESULT "Publishing results" "${updateYml}" "${ex}"
 
 summary
 
@@ -45,7 +44,10 @@ gitlab)
     curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/repository/commits/${CI_COMMIT_SHA}/comments" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "note=<${summaryTxtFile}"
+        -F "note=<${summaryTxtFile}" >"${commentJson}"
+    ex=0
+    grep -Fq "UnfixedReports: " "${commentJson}" || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Publishing comment" "${commentJson}" "${ex}"
     ;;
 *) ;;
 esac
