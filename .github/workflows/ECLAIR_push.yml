@@ -30,6 +30,6 @@ jobs:
         name: artifacts
         path: ECLAIR_out
     - name: Upload ECLAIR SARIF
-      run: ./ECLAIR/upload.sh
+      run: ./ECLAIR/upload_sarif.sh
     - name: Publish ECLAIR results
       run: ECLAIR/action_push.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}"
