@@ -20,8 +20,10 @@ jobs:
         cd ECLAIR
         ./analyze.sh
     - name: Analysis log
+      if: always()
       run: cat ECLAIR_out/ANALYSIS.log
     - name: Report log
+      if: always()
       run: cat ECLAIR_out/REPORT.log
     - name: Publish results
       env:
