@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: artifacts
-        path: ECLAIR/out
+        path: ECLAIR_out
     - name: Upload ECLAIR SARIF
       run: ./ECLAIR/upload.sh
     - name: Publish ECLAIR results
