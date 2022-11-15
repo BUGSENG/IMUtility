@@ -49,7 +49,7 @@ gitlab)
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
         -F "body=<${summaryTxt}" >"${commentLog}"
     ex=0
-    grep -Fq "UnfixedReports: " "${commentLog}" || ex=$?
+    grep -Fq "Unfixed reports: " "${commentLog}" || ex=$?
     maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 *) ;;
