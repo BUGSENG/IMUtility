@@ -19,6 +19,10 @@ jobs:
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh
+    - name: Analysis log
+      run: cat ECLAIR_out/ANALYSIS.log
+    - name: Report log
+      run: cat ECLAIR_out/REPORT.log
     - name: Publish results
       env:
         PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -26,10 +30,6 @@ jobs:
         PR_BASE_COMMIT_ID: ${{ github.event.pull_request.base.sha }}
         PR_USER: ${{ github.event.pull_request.user.login }}
       run: ECLAIR/action_pull_request.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
-    - name: Analysis log
-      run: cat ECLAIR_out/ANALYSIS.log
-    - name: Report log
-      run: cat ECLAIR_out/REPORT.log
     - name: Upload SARIF
       run: ./ECLAIR/upload.sh
     - name: Upload Artifact
