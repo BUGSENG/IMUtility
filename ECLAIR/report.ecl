@@ -13,8 +13,6 @@ strings_map("load_ecb",500,"",".*",0)
 map_strings("load_ecb", dir_entries(data_dir))
 loaded()
 
-setq(output_dir,"out")
-
 # Full output in pure text format.
 #full_txt(join_paths(output_dir,"txt"))
 # Output metrics for use with spreadsheet applications (if enabled).
