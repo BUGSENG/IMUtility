@@ -2,8 +2,6 @@
 
 set -eu
 
-cd "$(dirname "$0")"
-
 usage() {
     echo "Usage: $0 WTOKEN ANALYSIS_OUTPUT_DIR COMMIT_ID BASE_COMMIT_ID" >&2
     exit 2
@@ -17,17 +15,21 @@ analysisOutputDir=$2
 baseCommitId=$4
 
 # Source variables
-. ./action.settings
+. "$(dirname "$0")/action.settings"
 
 curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
--F "wtoken=${wtoken}" \
--F "artifactsDir=${artifactsDir}" \
--F "subDir=${subDir}" \
--F "jobId=${jobId}" \
--F "jobHeadline=${jobHeadline}" \
--F "baseCommitId=${baseCommitId}" \
--F "db=@${analysisOutputDir}/PROJECT.ecd" \
->"${updateYml}"
+    -F "wtoken=${wtoken}" \
+    -F "artifactsDir=${artifactsDir}" \
+    -F "subDir=${subDir}" \
+    -F "jobId=${jobId}" \
+    -F "jobHeadline=${jobHeadline}" \
+    -F "baseCommitId=${baseCommitId}" \
+    -F "db=@${analysisOutputDir}/PROJECT.ecd" \
+    >"${updateYml}"
+if ! grep -Fq "unfixedReports: " "${updateYml}"; then
+    cat "${updateYml}"
+    exit 1
+fi
 
 summary
 
@@ -47,4 +49,3 @@ gitlab)
     ;;
 *) ;;
 esac
-

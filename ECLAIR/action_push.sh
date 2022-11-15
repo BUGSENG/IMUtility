@@ -2,8 +2,6 @@
 
 set -eu
 
-cd "$(dirname "$0")"
-
 usage() {
     echo "Usage: $0 WTOKEN ANALYSIS_OUTPUT_DIR COMMIT_ID" >&2
     exit 2
@@ -16,18 +14,22 @@ analysisOutputDir=$2
 commitId=$3
 
 # Source variables
-. ./action.settings
+. "$(dirname "$0")/action.settings"
 
 curl -sS "${eclairReportUrlPrefix}/ext/update_push" \
--F "wtoken=${wtoken}" \
--F "artifactsDir=${artifactsDir}" \
--F "subDir=${subDir}" \
--F "jobId=${jobId}" \
--F "jobHeadline=${jobHeadline}" \
--F "commitId=${commitId}" \
--F "badgeLabel=${badgeLabel}" \
--F "db=@${analysisOutputDir}/PROJECT.ecd" \
->"${updateYml}"
+    -F "wtoken=${wtoken}" \
+    -F "artifactsDir=${artifactsDir}" \
+    -F "subDir=${subDir}" \
+    -F "jobId=${jobId}" \
+    -F "jobHeadline=${jobHeadline}" \
+    -F "commitId=${commitId}" \
+    -F "badgeLabel=${badgeLabel}" \
+    -F "db=@${analysisOutputDir}/PROJECT.ecd" \
+    >"${updateYml}"
+if ! grep -Fq "unfixedReports: " "${updateYml}"; then
+    cat "${updateYml}"
+    exit 1
+fi
 
 summary
 
