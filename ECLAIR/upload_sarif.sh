@@ -9,6 +9,7 @@ HERE=$( (
 
 . "${HERE}/eclair_settings.sh"
 . "${HERE}/action.helpers"
+ci=github
 
 sarifPack=${HERE}/sarif.gz.b64
 uploadLog=${HERE}/upload.log
