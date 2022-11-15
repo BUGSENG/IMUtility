@@ -22,4 +22,4 @@ gh api --method POST -H "Accept: application/vnd.github+json" \
     -f "commit_sha=${GITHUB_SHA}" -f "ref=${GITHUB_REF}" \
     -F "sarif=@${sarifPack}" \
     --silent >"${uploadLog}" 2>&1 || ex=$?
-maybe_log_file_exit ADD_COMMENT "Adding comment" "${uploadLog}" "${ex}"
+maybe_log_file_exit ADD_COMMENT "Uploading SARIF" "${uploadLog}" "${ex}"
