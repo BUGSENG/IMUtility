@@ -7,9 +7,8 @@ if [ -n "${VARIANT+x}" ]; then
     variantHeadline=" [${VARIANT}]"
 fi
 
-if [ -n "${GITLAB_CI+x}" ]; then
-    ci=gitlab
-
+case "$ci" in
+gitlab)
     gitlabApiUrl="${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4"
     # To be customized
     gitlabBotToken="${ECLAIRIT_TOKEN}"
@@ -35,10 +34,8 @@ if [ -n "${GITLAB_CI+x}" ]; then
         exit 1
         ;;
     esac
-elif [ -n "${GITHUB_ACTION+x}" ]; then
-    # Fit to repo setup, and add to the ECLAIR folder
-    ci=github
-
+    ;;
+github)
     # To be customized
     artifactsRoot=/home/eclair-github/public
     repository=${GITHUB_REPOSITORY}
@@ -64,10 +61,11 @@ elif [ -n "${GITHUB_ACTION+x}" ]; then
         exit 1
         ;;
     esac
-else
+    ;;
+*)
     echo "Unexpected CI/CD context" >&2
     exit 1
-fi
+esac
 
 case "${event}" in
 pull_request)

@@ -1,3 +1,12 @@
+if [ -n "${GITLAB_CI+x}" ]; then
+    ci=gitlab
+elif [ -n "${GITHUB_ACTION+x}" ]; then
+    ci=github
+else
+    echo "Unexpected CI/CD context" >&2
+    exit 1
+fi
+
 open_section() {
     id=$1
     title=$2

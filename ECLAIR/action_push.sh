@@ -14,8 +14,8 @@ analysisOutputDir=$2
 commitId=$3
 
 # Load settings and helpers
-. "$(dirname "$0")/action.settings"
 . "$(dirname "$0")/action.helpers"
+. "$(dirname "$0")/action.settings"
 
 curl -sS "${eclairReportUrlPrefix}/ext/update_push" \
     -F "wtoken=${wtoken}" \

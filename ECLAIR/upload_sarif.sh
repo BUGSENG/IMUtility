@@ -7,9 +7,8 @@ HERE=$( (
     echo "${PWD}"
 ))
 
-. "${HERE}/eclair_settings.sh"
 . "${HERE}/action.helpers"
-ci=github
+. "${HERE}/eclair_settings.sh"
 
 sarifPack=${HERE}/sarif.gz.b64
 uploadLog=${HERE}/upload.log
