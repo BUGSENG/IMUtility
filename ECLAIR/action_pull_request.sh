@@ -25,29 +25,31 @@ curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
     -F "jobHeadline=${jobHeadline}" \
     -F "baseCommitId=${baseCommitId}" \
     -F "db=@${analysisOutputDir}/PROJECT.ecd" \
-    >"${updateYml}"
+    >"${updateLog}"
 ex=0
-grep -Fq "unfixedReports: " "${updateYml}" || ex=$?
-maybe_log_file_exit PUBLISH_RESULT "Publishing results" "${updateYml}" "${ex}"
+grep -Fq "unfixedReports: " "${updateLog}" || ex=$?
+maybe_log_file_exit PUBLISH_RESULT "Publishing results" "${updateLog}" "${ex}"
 
 summary
 
 case ${ci} in
 github)
+    ex=0
     gh api \
         --method POST \
         "/repos/${repository}/issues/${pullRequestId}/comments" \
-        -F "body=@${summaryTxtFile}" \
-        --silent
+        -F "body=@${summaryTxt}" \
+        --silent 2>&1 || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Publishing comment" "${commentLog}" "${ex}"
     ;;
 gitlab)
     curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/merge_requests/${pullRequestId}/notes" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "body=<${summaryTxtFile}" >"${commentJson}"
+        -F "body=<${summaryTxt}" >"${commentLog}"
     ex=0
-    grep -Fq "UnfixedReports: " "${commentJson}" || ex=$?
-    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentJson}" "${ex}"
+    grep -Fq "UnfixedReports: " "${commentLog}" || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 *) ;;
 esac
