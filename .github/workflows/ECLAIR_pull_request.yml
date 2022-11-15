@@ -25,6 +25,12 @@ jobs:
     - name: Report log
       if: always()
       run: cat ECLAIR_out/REPORT.log
+    - name: Upload Artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: artifacts
+        path: ECLAIR/out
     - name: Publish results
       env:
         PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}
@@ -34,8 +40,3 @@ jobs:
       run: ECLAIR/action_pull_request.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}" "${PR_BASE_COMMIT_ID}"
     - name: Upload SARIF
       run: ./ECLAIR/upload.sh
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: artifacts
-        path: ECLAIR/out

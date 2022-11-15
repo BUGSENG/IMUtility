@@ -23,12 +23,13 @@ jobs:
     - name: Report log
       if: always()
       run: cat ECLAIR_out/REPORT.log
-    - name: Publish results
-      run: ECLAIR/action_push.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}"
-    - name: Upload SARIF
-      run: ./ECLAIR/upload.sh
     - name: Upload Artifact
+      if: always()
       uses: actions/upload-artifact@v3
       with:
         name: artifacts
         path: ECLAIR_out
+    - name: Publish results
+      run: ECLAIR/action_push.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}"
+    - name: Upload SARIF
+      run: ./ECLAIR/upload.sh
