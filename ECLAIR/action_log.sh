@@ -1,7 +1,6 @@
 #!/bin/sh
-# set -u is intentionally not used, as it would require
-# to specify unneeded variables
-set -e
+
+set -eu
 
 usage() {
     echo "Usage: $0 SECTION_ID SECTION_NAME FILE EXIT_CODE" >&2
@@ -10,7 +9,7 @@ usage() {
 
 [ $# -eq 4 ] || usage
 
-# Load utility functions
-. "$(dirname "$0")/action.settings"
+# Load settings and helpers
+. "$(dirname "$0")/action.helpers"
 
 log_file "$@"
