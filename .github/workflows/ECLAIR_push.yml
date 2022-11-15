@@ -13,11 +13,15 @@ jobs:
         submodules: 'true'
     - name: Analyze
       run: |
-        set -e
+        set -eu
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh
-        ./action_push.sh "${WTOKEN}" out "${GITHUB_SHA}"
+        ./action_push.sh "${WTOKEN}" ../ECLAIR_out "${GITHUB_SHA}"
+    - name: Analysis log
+      run: cat ../ECLAIR_out/ANALYSIS.log
+    - name: Report log
+      run: cat ../ECLAIR_out/REPORT.log
     - name: Upload SARIF
       run: |
         ./ECLAIR/upload.sh
@@ -25,4 +29,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: artifacts
-        path: ECLAIR/out
+        path: ECLAIR_out

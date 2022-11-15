@@ -20,7 +20,7 @@ jobs:
         PR_BASE_COMMIT_ID: ${{ github.event.pull_request.base.sha }}
         PR_USER: ${{ github.event.pull_request.user.login }}
       run: |
-        set -e
+        set -eu
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh

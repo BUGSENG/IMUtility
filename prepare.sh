@@ -1,5 +1,5 @@
 #!/bin/sh
 
-set -e
+set -eu
 
 #cd "$(dirname "$0")"
