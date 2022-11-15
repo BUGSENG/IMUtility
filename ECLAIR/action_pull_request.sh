@@ -39,8 +39,8 @@ github)
         --method POST \
         "/repos/${repository}/issues/${pullRequestId}/comments" \
         -F "body=@${summaryTxt}" \
-        --silent 2>&1 || ex=$?
-    maybe_log_file_exit ADD_COMMENT "Publishing comment" "${commentLog}" "${ex}"
+        --silent >"${commentLog}" 2>&1 || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 gitlab)
     curl -sS --request POST \

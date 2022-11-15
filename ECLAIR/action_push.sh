@@ -40,7 +40,7 @@ github)
         "/repos/${repository}/commits/${commitId}/comments" \
         -F "body=@${summaryTxt}" \
         --silent >"${commentLog}" 2>&1 || ex=$?
-    maybe_log_file_exit ADD_COMMENT "Publishing comment" "${commentLog}" "${ex}"
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 gitlab)
     curl -sS --request POST \
@@ -49,7 +49,7 @@ gitlab)
         -F "note=<${summaryTxt}" >"${commentLog}"
     ex=0
     grep -Fq "UnfixedReports: " "${commentLog}" || ex=$?
-    maybe_log_file_exit ADD_COMMENT "Publishing comment" "${commentLog}" "${ex}"
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 *) ;;
 esac
