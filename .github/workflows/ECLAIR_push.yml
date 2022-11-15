@@ -17,7 +17,6 @@ jobs:
         ./prepare.sh
         cd ECLAIR
         ./analyze.sh
-        false
     - name: Analysis log
       if: always()
       run: cat ECLAIR_out/ANALYSIS.log
