@@ -18,7 +18,7 @@ jobs:
         cd ECLAIR
         ./analyze.sh
     - name: Publish results
-        run: ./action_push.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}"
+      run: ./action_push.sh "${WTOKEN}" ECLAIR_out "${GITHUB_SHA}"
     - name: Analysis log
       run: cat ECLAIR_out/ANALYSIS.log
     - name: Report log
