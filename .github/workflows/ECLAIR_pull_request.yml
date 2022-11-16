@@ -32,7 +32,7 @@ jobs:
         name: artifacts
         path: ECLAIR_out
     - name: Upload ECLAIR SARIF
-      run: ./ECLAIR/upload.sh
+      run: ./ECLAIR/action_upload_sarif.sh ECLAIR_out/reports.sarif
     - name: Publish ECLAIR results
       env:
         PR_HEAD_REF: ${{ github.event.pull_request.head.ref }}

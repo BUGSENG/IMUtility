@@ -7,9 +7,8 @@ if [ -n "${VARIANT+x}" ]; then
     variantHeadline=" [${VARIANT}]"
 fi
 
-if [ -n "${GITLAB_CI+x}" ]; then
-    ci=gitlab
-
+case "$ci" in
+gitlab)
     gitlabApiUrl="${CI_SERVER_PROTOCOL}://${CI_SERVER_HOST}:${CI_SERVER_PORT}/api/v4"
     # To be customized
     gitlabBotToken="${ECLAIRIT_TOKEN}"
@@ -35,10 +34,8 @@ if [ -n "${GITLAB_CI+x}" ]; then
         exit 1
         ;;
     esac
-elif [ -n "${GITHUB_ACTION+x}" ]; then
-    # Fit to repo setup, and add to the ECLAIR folder
-    ci=github
-
+    ;;
+github)
     # To be customized
     artifactsRoot=/home/eclair-github/public
     repository=${GITHUB_REPOSITORY}
@@ -64,10 +61,11 @@ elif [ -n "${GITHUB_ACTION+x}" ]; then
         exit 1
         ;;
     esac
-else
+    ;;
+*)
     echo "Unexpected CI/CD context" >&2
     exit 1
-fi
+esac
 
 case "${event}" in
 pull_request)
@@ -93,50 +91,7 @@ eclairReportUrlPrefix=https://eclairit.com:3787
 
 artifactsDir=${artifactsRoot}/${repository}.ecdf
 jobDir=${artifactsDir}/${subDir}/${jobId}
-updateYml=${analysisOutputDir}/update.yml
+updateLog=${analysisOutputDir}/update.log
+commentLog=${analysisOutputDir}/comment.json
 indexHtmlUrl=${eclairReportUrlPrefix}/fs${jobDir}/index.html
-summaryTxtFile="${analysisOutputDir}/summary.txt"
-
-summary() {
-    fixedReports=
-    newReports=
-    unfixedReports=
-    while read -r line; do
-        var=${line%%: *}
-        val=${line#*: }
-        eval "${var}=${val}"
-    done <"${updateYml}"
-
-    cat <<EOF >"${summaryTxtFile}"
-# [![ECLAIR](${eclairReportUrlPrefix}/rsrc/eclair.png)](https://www.bugseng.com/eclair) Analysis summary
-${jobHeadline}
-
-Fixed reports: ${fixedReports}
-
-Unfixed reports: ${unfixedReports} [new: ${newReports}]
-
-[Browse analysis](${indexHtmlUrl})
-EOF
-
-    case ${ci} in
-    github)
-        cat "${summaryTxtFile}" >"${GITHUB_STEP_SUMMARY}"
-        ;;
-    gitlab)
-        esc=$(printf '\e')
-        cr=$(printf '\r')
-        # Generate summary and print it (GitLab-specific)
-        cat <<EOF
-${esc}[0Ksection_start:$(date +%s):ECLAIR_summary${cr}${esc}[0K${esc}[1m${esc}[36mECLAIR analysis summary${esc}[m
-Fixed reports: ${fixedReports}
-Unfixed reports: ${unfixedReports} [new: ${newReports}]
-Browse analysys: ${esc}[33m${indexHtmlUrl}${esc}[m
-${esc}[0Ksection_end:$(date +%s):ECLAIR_summary${cr}${esc}[0K
-EOF
-        ;;
-    *)
-        echo "Unexpected CI/CD context" >&2
-        exit 1
-        ;;
-    esac
-}
+summaryTxt="${analysisOutputDir}/summary.txt"

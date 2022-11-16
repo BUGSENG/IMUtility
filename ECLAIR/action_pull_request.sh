@@ -14,7 +14,8 @@ analysisOutputDir=$2
 #commitId=$3
 baseCommitId=$4
 
-# Source variables
+# Load settings and helpers
+. "$(dirname "$0")/action.helpers"
 . "$(dirname "$0")/action.settings"
 
 curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
@@ -25,27 +26,31 @@ curl -sS "${eclairReportUrlPrefix}/ext/update_pull_request" \
     -F "jobHeadline=${jobHeadline}" \
     -F "baseCommitId=${baseCommitId}" \
     -F "db=@${analysisOutputDir}/PROJECT.ecd" \
-    >"${updateYml}"
-if ! grep -Fq "unfixedReports: " "${updateYml}"; then
-    cat "${updateYml}"
-    exit 1
-fi
+    >"${updateLog}"
+ex=0
+grep -Fq "unfixedReports: " "${updateLog}" || ex=$?
+maybe_log_file_exit PUBLISH_RESULT "Publishing results" "${updateLog}" "${ex}"
 
 summary
 
 case ${ci} in
 github)
+    ex=0
     gh api \
         --method POST \
         "/repos/${repository}/issues/${pullRequestId}/comments" \
-        -F "body=@${summaryTxtFile}" \
-        --silent
+        -F "body=@${summaryTxt}" \
+        --silent >"${commentLog}" 2>&1 || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 gitlab)
     curl -sS --request POST \
         "${gitlabApiUrl}/projects/${CI_PROJECT_ID}/merge_requests/${pullRequestId}/notes" \
         -H "PRIVATE-TOKEN: ${gitlabBotToken}" \
-        -F "body=<${summaryTxtFile}"
+        -F "body=<${summaryTxt}" >"${commentLog}"
+    ex=0
+    grep -Fq "Unfixed reports: " "${commentLog}" || ex=$?
+    maybe_log_file_exit ADD_COMMENT "Adding comment" "${commentLog}" "${ex}"
     ;;
 *) ;;
 esac
