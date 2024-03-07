@@ -52,6 +52,13 @@ Join us on the Discord channel https://discord.gg/R6nZxZqDH3
 - Base64_encode
 - Base64_decode
 
+### Bit manipulation
+- BitManipulation_reflect
+- BitManipulation_bitSet
+- BitManipulation_setBit
+- BitManipulation_clearBit
+- BitManipulation_toggleBit
+
 ### Bubble sort
 - BubbleSort_sort
 
@@ -121,16 +128,21 @@ Join us on the Discord channel https://discord.gg/R6nZxZqDH3
 - Json_endString
 - Json_findByKey
 
+### Map
+- Map_init
+- Map_insert
+- Map_getValue
+
 ### Priority queue
-- PriorityQueue_initQueue
-- PriorityQueue_isEmpty
+- PriorityQueue_init
+- PriorityQueue_empty
 - PriorityQueue_enqueue
 - PriorityQueue_dequeue
 
 ### Queue
-- Queue_initQueue
-- Queue_isFull
-- Queue_isEmpty
+- Queue_init
+- Queue_full
+- Queue_empty
 - Queue_enqueue
 - Queue_dequeue
 - Queue_front
@@ -141,10 +153,12 @@ Join us on the Discord channel https://discord.gg/R6nZxZqDH3
 - Scheduler_addTask
 - Scheduler_run
 
+### Selection sort
+- SelectionSort_sort
+
 ### Utils
-- Utils_BitReflect
 - Utils_StringToUint32
-- Utils_SwapElements
+- Utils_swapElements
 - Utils_QuickUint32Pow10
 - Utils_Serialize8
 - Utils_Deserialize8

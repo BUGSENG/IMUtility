@@ -32,24 +32,55 @@
  *
  ****************************************************************************/
 
-#include "bubble_sort.h"
+#ifndef UTILITY_MAP_H_
+#define UTILITY_MAP_H_
 
-#include "utils.h"
+#include "typedefs.h"
 
-void
-BubbleSort_sort(byte_t* buffer, int32_t number_of_elements, uint32_t element_size,
-                bool (*compareFun)(void* first, void* second)) {
-    byte_t* elements = buffer;
-    bool swapped = true;
-    int32_t i = 0;
-    while (swapped) {
-        swapped = false;
-        for (int32_t j = 0; j < (number_of_elements - i - 1); ++j) {
-            if (compareFun(&elements[j * (int32_t)element_size], &elements[(j + 1) * (int32_t)element_size])) {
-                Utils_SwapElements(&elements[j * (int32_t)element_size], &elements[(j + 1) * (int32_t)element_size], element_size);
-                swapped = true;
-            }
-        }
-        ++i;
-    }
-}
+typedef struct {
+    byte_t* keys;
+    byte_t* values;
+    int32_t key_size;
+    int32_t value_size;
+    int32_t max_map_size;
+    int32_t current_size;
+} Map_t;
+
+/**
+ * @brief Initialize map.
+ *
+ * @param[out] *map Pointer to the map (type Map_t).
+ * @param[in] *keys Pointer to keys in the map.
+ * @param[in] *values Pointer to values in the map.
+ * @param[in] key_size Size of the key in the map.
+ * @param[in] value_size Size of the value in the map.
+ * @param[in] max_map_size Max size of the map.
+ *
+ * @return True if map is successfully initialized, otherwise false.
+ */
+bool Map_init(Map_t* map, byte_t* keys, byte_t* values, int32_t key_size, int32_t value_size,
+              int32_t max_map_size);
+
+/**
+ * @brief Insert new element in the map.
+ *
+ * @param[in/out] *map Pointer to the map (type Map_t).
+ * @param[in] *key Pointer to the key that will be inserted in the map.
+ * @param[in] *value Pointer to the value that will be inserted in the map.
+ *
+ * @return True if new element is successfully inserted in the map, otherwise false.
+ */
+bool Map_insert(Map_t* map, const byte_t* key, const byte_t* value);
+
+/**
+ * @brief Get a value from the map using the key.
+ *
+ * @param[in] *map Pointer to the map (type Map_t).
+ * @param[in] *key Pointer to the key.
+ * @param[out] *value Pointer to the value that is mapped with the particular key.
+ *
+ * @return True if the value is successfully gotten using the key, otherwise false.
+ */
+bool Map_getValue(const Map_t* map, const byte_t* key, byte_t* value);
+
+#endif /* UTILITY_MAP_H_ */

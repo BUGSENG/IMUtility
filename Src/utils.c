@@ -36,33 +36,8 @@
 
 #define MAX_UINT32_POW_10_EXPONENT 10U
 
-uint32_t
-Utils_BitReflect(uint32_t data, uint8_t n_bits) {
-
-    uint32_t reflection = 0u;
-    uint32_t temp_data = data;
-
-    /*
-    * Reflect the data around the center bit.
-    */
-    for (uint8_t bit = 0u; bit < n_bits; ++bit) {
-        /*
-        * If the LSB bit is set, set the reflection of it.
-        */
-        if (1u == (temp_data & 1u) ) {
-            /* -E> compliant MC3R1.R12.2 1 The shift count is granted to be between 0 and 31 due to bit masking. */
-            reflection |= (uint32_t)((uint32_t)1U << (0x1FU & ((n_bits - 1U) - bit)));
-        }
-
-        temp_data = (temp_data >> 1u);
-    }
-
-    return reflection;
-
-}
-
 bool
-Utils_StringToUint32(const char* str, const uint8_t str_length, uint32_t* integer) {
+Utils_StringToUint32(const char* str, uint8_t str_length, uint32_t* integer) {
     bool success = true;
     bool check_overflow = false;
     uint8_t i = 0U;
@@ -114,7 +89,7 @@ Utils_StringToUint32(const char* str, const uint8_t str_length, uint32_t* intege
 }
 
 void
-Utils_SwapElements(byte_t* first, byte_t* second, const uint32_t size) {
+Utils_swapElements(byte_t* first, byte_t* second, uint32_t size) {
     byte_t* first_element = first;
     byte_t* second_element = second;
     uint32_t index = size;
@@ -126,7 +101,7 @@ Utils_SwapElements(byte_t* first, byte_t* second, const uint32_t size) {
 }
 
 bool
-Utils_QuickUint32Pow10(const uint8_t exponent, uint32_t* result) {
+Utils_QuickUint32Pow10(uint8_t exponent, uint32_t* result) {
     bool success = false;
 
     const uint32_t pow10[MAX_UINT32_POW_10_EXPONENT] = {

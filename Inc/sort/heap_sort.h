@@ -32,55 +32,22 @@
  *
  ****************************************************************************/
 
-#include "heap_sort.h"
+#ifndef UTILITY_HEAP_SORT_H_
+#define UTILITY_HEAP_SORT_H_
 
-#include "utils.h"
+#include "typedefs.h"
 
-static void
-Heapify(byte_t* buffer, int32_t n, int32_t i, uint32_t element_size,
-        bool (*compareFun)(void* first, void* second)) {
-    bool continue_iterating = true;
-    int32_t index = i;
-    byte_t* elements = buffer;
+/**
+ * @brief Sort elements using heap sort algorithm.
+ *
+ * @param[in/out] *buffer Pointer to the buffer that contains elements that will be sorted.
+ * @param[in] number_of_elements Number of elements in the buffer.
+ * @param[in] element_size Size of the element, in bytes.
+ * @param[in] *compareFun Pointer to compare function. Compare function has two parameters (pointer to
+ *                        first element and pointer to second element). As a result, it returns boolean,
+ *                        true if first element is greater than second element, otherwise false.
+ */
+void HeapSort_sort(byte_t* buffer, int32_t number_of_elements, uint32_t element_size,
+                   bool (*compareFun)(void* first, void* second));
 
-    while (continue_iterating) {
-        int32_t largest = index;
-        int32_t left = (2 * index) + 1;
-        int32_t right = (2 * index) + 2;
-
-        bool compare_ret_value = compareFun(&elements[left * (int32_t)element_size],
-                                            &elements[largest * (int32_t)element_size]);
-
-        if ((left < n) && (compare_ret_value)) {
-            largest = left;
-        }
-
-        compare_ret_value = compareFun(&elements[right * (int32_t)element_size], &elements[largest * (int32_t)element_size]);
-
-        if ((right < n) && (compare_ret_value)) {
-            largest = right;
-        }
-
-        if (largest != index) {
-            Utils_SwapElements(&elements[index * (int32_t)element_size], &elements[largest * (int32_t)element_size], element_size);
-            index = largest;
-        } else {
-            continue_iterating = false;
-        }
-    }
-}
-
-void
-HeapSort_sort(byte_t* buffer, int32_t number_of_elements, uint32_t element_size,
-              bool (*compareFun)(void* first, void* second)) {
-    int32_t i;
-    byte_t* elements = buffer;
-    for (i = (number_of_elements / 2) - 1; i >= 0; --i) {
-        Heapify(elements, number_of_elements, i, element_size, compareFun);
-    }
-
-    for (i = number_of_elements - 1; i >= 0; --i) {
-        Utils_SwapElements(&elements[0], &elements[i * (int32_t)element_size], element_size);
-        Heapify(elements, i, 0, element_size, compareFun);
-    }
-}
+#endif /* UTILITY_HEAP_SORT_H_ */

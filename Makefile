@@ -56,7 +56,7 @@ TARGET = $(TARGET_DIR)/$(TARGET_BASE)$(TARGET_EXTENSION)
 
 IMUTILITY_FILES=\
   Src/base64.c \
-  Src/bubble_sort.c \
+  Src/bit_manipulation.c \
   Src/crc/crc8_base.c \
   Src/crc/crc8_variants/crc8.c \
   Src/crc/crc8_variants/crc8_8h2f.c \
@@ -105,8 +105,11 @@ IMUTILITY_FILES=\
   Src/crc/crc32_variants/crc32_posix.c \
   Src/crc/crc32_variants/crc32_q.c \
   Src/crc/crc32_variants/crc32_xfer.c \
-  Src/heap_sort.c \
+  Src/sort/bubble_sort.c \
+  Src/sort/heap_sort.c \
+  Src/sort/selection_sort.c \
   Src/json.c \
+  Src/map.c \
   Src/priority_queue.c \
   Src/queue.c \
   Src/scheduler.c \
@@ -115,18 +118,21 @@ IMUTILITY_FILES=\
 SRC_FILES+=$(IMUTILITY_FILES) \
   $(UNITY_ROOT)/src/unity.c \
   $(UNITY_ROOT)/extras/fixture/src/unity_fixture.c \
-  Tests/Helper/sort_functions.c \
+  Tests/helper/sort_functions.c \
   Tests/test_main.c \
   Tests/test_base64.c \
+  Tests/test_bit_manipulation.c \
   Tests/test_bubble_sort.c \
   Tests/test_crc8.c \
   Tests/test_crc16.c \
   Tests/test_crc32.c \
   Tests/test_heap_sort.c \
   Tests/test_json.c \
+  Tests/test_map.c \
   Tests/test_priority_queue.c \
   Tests/test_queue.c \
   Tests/test_scheduler.c \
+  Tests/test_selection_sort.c \
   Tests/test_utils.c
 INC_DIRS_CODE=-IInc -IInc/crc -IInc/crc/crc8_variants -IInc/crc/crc16_variants -IInc/crc/crc32_variants
 INC_DIRS=$(INC_DIRS_CODE) -I$(UNITY_ROOT)/src -I$(UNITY_ROOT)/extras/fixture/src
